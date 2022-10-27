@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: posterr-db
+    environment:
+      - POSTGRES_USER=posterr
+      - POSTGRES_PASSWORD=secure_password
+      - POSTGRES_DB=posterr
+    ports:
+      - 5445:5432
+
+  app:
+    build:
+      context: .
+    container_name: posterr-app
+    environment:
+      POSTGRES_USER: user
+      ENV: local-docker
+      PORT: 9000
+      DATABASE_URL: postgres://posterr:secure_password@db:5432/posterr?sslmode=disable
+      DATABASE_NAME: posterr
+      MIGRATION_PATH: migrations
+      SHOULD_MIGRATE: 'true'
+    ports:
+      - 9000:9000
