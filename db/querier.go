@@ -7,7 +7,8 @@ import (
 )
 
 type Querier interface {
-	SeedUsers(ctx context.Context) error
+	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
+	SeedUser(ctx context.Context, arg SeedUserParams) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

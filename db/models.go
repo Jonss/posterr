@@ -3,8 +3,17 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
+
+type Post struct {
+	ID             int64          `json:"id"`
+	Content        sql.NullString `json:"content"`
+	UserID         int64          `json:"user_id"`
+	OriginalPostID sql.NullInt64  `json:"original_post_id"`
+	CreatedAt      time.Time      `json:"created_at"`
+}
 
 type User struct {
 	ID        int64     `json:"id"`

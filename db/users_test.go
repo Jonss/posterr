@@ -7,12 +7,21 @@ import (
 )
 
 func TestSeedUsers(t *testing.T) {
-	querier, tearDown := NewDbTestSetup(t)
+	querier, tearDown := newDbTestSetup(t)
 	defer tearDown()
 
 	ctx := context.Background()
-	if err := querier.SeedUsers(ctx); err != nil {
-		t.Fatalf("error seeding users: error=(%v)", err)
+
+	users := []SeedUserParams{
+		{1, "fferdinand"},
+		{2, "fjosef"},
+		{3, "sissi"},
+		{4, "maximilian"},
+	}
+	for _, u := range users {
+		if _, err := querier.SeedUser(ctx, u); err != nil {
+			t.Fatalf("error seeding users: error=(%v)", err)
+		}
 	}
 
 	testCases := []struct{

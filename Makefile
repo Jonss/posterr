@@ -18,3 +18,7 @@ generate-query:
 
 run-docker:
 	docker-compose up --build -d app
+
+seed:
+	go run cmd/seed/main.go
+

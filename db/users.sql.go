@@ -7,15 +7,18 @@ import (
 	"context"
 )
 
-const seedUsers = `-- name: SeedUsers :exec
-INSERT INTO users(id, username) VALUES
-    (1, 'fferdinand'),
-    (2, 'fjosef'),
-    (3, 'sissi'),
-    (4, 'maximilian')
+const seedUser = `-- name: SeedUser :one
+INSERT INTO users(id, username) VALUES ($1, $2) returning id
 `
 
-func (q *Queries) SeedUsers(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, seedUsers)
-	return err
+type SeedUserParams struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+}
+
+func (q *Queries) SeedUser(ctx context.Context, arg SeedUserParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, seedUser, arg.ID, arg.Username)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }

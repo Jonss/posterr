@@ -7,13 +7,13 @@ import (
 	"github.com/jonss/testcontainers-go-wrapper/pg"
 )
 
-/* NewDbTestSetup does:
+/* newDbTestSetup does:
 - configures a container with postgres,
 - creates a connection
 - run migration
 - returns a New Queries to
 */
-func NewDbTestSetup(t *testing.T) (*Queries, func()) {
+func newDbTestSetup(t *testing.T) (*Queries, func()) {
 	cfg := pg.PostgresCfg{
 		ImageName: "postgres:15-alpine",
 		Password:  "a_secret_password",
