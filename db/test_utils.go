@@ -21,7 +21,7 @@ func newDbTestSetup(t *testing.T) (*Queries, func()) {
 		UserName:  "test",
 		DbName:    "posterr_test",
 	}
-	
+
 	pgInfo, err := pg.Container(context.Background(), cfg)
 	if err != nil {
 		t.Fatalf("error creating pgContainer. error=(%v)", err)
@@ -44,6 +44,7 @@ func newDbTestSetup(t *testing.T) (*Queries, func()) {
 	return New(dbConn), pgInfo.TearDown
 }
 
+// parsedDate parses a date in the format yyyy-MM-dd
 func parsedDate(dateStr string, t *testing.T) time.Time {
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
@@ -52,6 +53,7 @@ func parsedDate(dateStr string, t *testing.T) time.Time {
 	return date
 }
 
+// parsedDatePtr parses a date in the format yyyy-MM-dd as pointer
 func parsedDatePtr(dateStr string, t *testing.T) *time.Time {
 	d := parsedDate(dateStr, t)
 	return &d

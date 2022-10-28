@@ -26,12 +26,12 @@ const fetchPosts = `
 `
 
 type FetchPostsParams struct {
-	UserID int64
+	UserID        int64
 	IsOnlyMyPosts bool
-	Size int
-	Page int
-	StartDate *time.Time
-	EndDate *time.Time
+	Size          int
+	Page          int
+	StartDate     *time.Time
+	EndDate       *time.Time
 }
 
 type DetailedPost struct {
@@ -40,12 +40,12 @@ type DetailedPost struct {
 }
 
 type FetchPost struct {
-	Post DetailedPost
+	Post         DetailedPost
 	OriginalPost *DetailedPost
 }
 
 type FetchPosts struct {
-	Posts []FetchPost
+	Posts   []FetchPost
 	HasNext bool
 	HasPrev bool
 }
@@ -57,7 +57,7 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 	values := make([]interface{}, 0)
 
 	if arg.IsOnlyMyPosts {
-		query = fmt.Sprintf("%s %s p1.user_id = $%d",query, andOrWhere(len(values)), count)
+		query = fmt.Sprintf("%s %s p1.user_id = $%d", query, andOrWhere(len(values)), count)
 		count++
 		values = append(values, arg.UserID)
 	}
@@ -98,12 +98,12 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 			&p2.Username,
 		)
 
-		f := FetchPost{Post: p1, OriginalPost: &p2 }
+		f := FetchPost{Post: p1, OriginalPost: &p2}
 		posts = append(posts, f)
 	}
 
 	fetchPosts := FetchPosts{
-		Posts: posts,
+		Posts:   posts,
 		HasNext: len(posts) > 0 && len(posts) == arg.Size,
 		HasPrev: arg.Page > 0,
 	}

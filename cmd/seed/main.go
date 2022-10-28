@@ -21,11 +21,10 @@ func main() {
 	}
 	querier := db.New(dbConn)
 	if cfg.IsLocal() {
-		users := []string{"rhaenyra", "viserys", "daemon", "aegon"}	
+		users := []string{"rhaenyra", "viserys", "daemon", "aegon"}
 		execSeed(ctx, cfg, querier, users)
 	}
 }
-
 
 func execSeed(
 	ctx context.Context,
@@ -35,7 +34,7 @@ func execSeed(
 ) {
 	for _, u := range users {
 		if _, err := querier.SeedUser(ctx, u); err != nil {
-		log.Fatalf("seed users failed: error=(%v)", err)
+			log.Fatalf("seed users failed: error=(%v)", err)
+		}
 	}
-}
 }

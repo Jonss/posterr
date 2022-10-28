@@ -1,4 +1,4 @@
-package httpapi
+package httpserver
 
 import (
 	"fmt"
@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"github.com/Jonss/posterr/config"
+	"github.com/Jonss/posterr/pkg/post"
 	"github.com/gorilla/mux"
 )
 
 type Services struct {
+	PostService post.Service
 }
 
 type HttpServer struct {
@@ -25,9 +27,9 @@ func NewHttpServer(
 	s Services,
 ) *HttpServer {
 	h := &HttpServer{
-		router:        r,
-		config:        cfg,
-		services:      s,
+		router:   r,
+		config:   cfg,
+		services: s,
 	}
 	return h
 }

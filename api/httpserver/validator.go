@@ -1,6 +1,7 @@
-package httpapi
+package httpserver
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -17,7 +18,10 @@ type Validator struct {
 
 func NewValidator() (*Validator, error) {
 	uni := ut.New(en.New())
-	translation, _ := uni.GetTranslator("en")
+	translation, found := uni.GetTranslator("en")
+	if !found {
+		return nil, errors.New("error on get translador, 'en'not found")
+	}
 	validate := validator.New()
 
 	err := en_translations.RegisterDefaultTranslations(validate, translation)

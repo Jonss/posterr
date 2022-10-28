@@ -7,12 +7,12 @@ import (
 )
 
 type Config struct {
-	Env             string `mapstruct:"ENV"`
-	Port            string `mapstructure:"PORT"`
-	DBURL           string `mapstructure:"DATABASE_URL"`
-	DBName          string `mapstructure:"DATABASE_NAME"`
-	MigrationPath 	string `mapstructure:"MIGRATION_PATH"`
-	ShouldMigrate 	bool `mapstructure:"SHOULD_MIGRATE"`
+	Env           string `mapstruct:"ENV"`
+	Port          string `mapstructure:"PORT"`
+	DBURL         string `mapstructure:"DATABASE_URL"`
+	DBName        string `mapstructure:"DATABASE_NAME"`
+	MigrationPath string `mapstructure:"MIGRATION_PATH"`
+	ShouldMigrate bool   `mapstructure:"SHOULD_MIGRATE"`
 }
 
 func LoadConfig() (Config, error) {

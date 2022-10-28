@@ -24,31 +24,31 @@ func TestSeedUsers(t *testing.T) {
 		}
 	}
 
-	testCases := []struct{
-		name string
+	testCases := []struct {
+		name     string
 		username string
-		wantErr error
-	} {
+		wantErr  error
+	}{
 		{
-			name: "should find user fferdinand",
+			name:     "should find user fferdinand",
 			username: "fferdinand",
 		},
 		{
-			name: "should find user fjosef",
+			name:     "should find user fjosef",
 			username: "fjosef",
 		},
 		{
-			name: "should find user sissi",
+			name:     "should find user sissi",
 			username: "sissi",
 		},
 		{
-			name: "should find user maximilian",
+			name:     "should find user maximilian",
 			username: "maximilian",
 		},
 		{
-			name: "should not find user connor_mcleod",
+			name:     "should not find user connor_mcleod",
 			username: "connor_mcleod",
-			wantErr: sql.ErrNoRows,
+			wantErr:  sql.ErrNoRows,
 		},
 	}
 
@@ -58,7 +58,7 @@ func TestSeedUsers(t *testing.T) {
 			row := querier.db.QueryRowContext(ctx, query, tc.username)
 			var got User
 			err := row.Scan(&got.ID, &got.Username)
-		
+
 			if err != nil && err != tc.wantErr {
 				t.Fatalf("err = %v, want %v", tc.wantErr, err)
 			}
@@ -67,7 +67,7 @@ func TestSeedUsers(t *testing.T) {
 				if got.Username != tc.username {
 					t.Fatalf("username = %v, want %v", got.Username, tc.username)
 				}
-			}	
+			}
 		})
 	}
 }

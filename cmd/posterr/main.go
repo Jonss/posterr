@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Jonss/posterr/api/httpapi"
+	"github.com/Jonss/posterr/api/httpserver"
 	"github.com/Jonss/posterr/config"
 	"github.com/Jonss/posterr/db"
+	"github.com/Jonss/posterr/pkg/post"
 	"github.com/gorilla/mux"
 )
 
@@ -21,32 +22,41 @@ func main() {
 	if err != nil {
 		log.Fatalf("error connecting to database: error=(%v)", err)
 	}
-	db.New(dbConn)
 
+	q := db.New(dbConn)
+
+	// checks if flag to migrate on startup is on
 	if cfg.ShouldMigrate {
 		if err := db.Migrate(dbConn, cfg.DBName, cfg.MigrationPath); err != nil {
 			log.Fatalf("key 'SHOULD_MIGRATE' is (%t) but migration failed: error=(%v)", cfg.ShouldMigrate, err)
 		}
 	}
 
+	// creates router
 	router := mux.NewRouter()
 
-	services := httpapi.Services{}
-	httpServer := httpapi.NewHttpServer(
+	// creates services
+	services := httpserver.Services{
+		PostService: post.NewPostService(q),
+	}
+
+	// creates httpServer
+	httpServer := httpserver.NewHttpServer(
 		router,
 		cfg,
 		services,
 	)
+	// starts httpServer
 	httpServer.Start()
 
-	addr := "0.0.0.0:"+cfg.Port
+	addr := "0.0.0.0:" + cfg.Port
 	server := &http.Server{
-		Handler: router,
-		Addr:   addr,
+		Handler:      router,
+		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
 	log.Println("Posterr Server started!")
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(server.ListenAndServe()) // start app
 }

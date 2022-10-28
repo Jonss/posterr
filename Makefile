@@ -22,3 +22,5 @@ run-docker:
 seed:
 	go run cmd/seed/main.go
 
+fmt:
+	gofmt -s -w .

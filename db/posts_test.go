@@ -18,37 +18,37 @@ func TestCreatePost(t *testing.T) {
 
 	originalPost, err := querier.CreatePost(ctx, CreatePostParams{
 		Content: sql.NullString{String: "Original post", Valid: true},
-		UserID: userID,
+		UserID:  userID,
 	})
 	if err != nil {
 		t.Fatalf("error creating originalPost. error=(%v)", err)
 	}
 
-	testCases := []struct{
-		name string
-		post CreatePostParams
- 		wantErr error
+	testCases := []struct {
+		name    string
+		post    CreatePostParams
+		wantErr error
 	}{
 		{
 			name: "should create a post",
 			post: CreatePostParams{
-				Content: sql.NullString{String: "Hello, world! This is my first post", Valid: true},	
-				UserID: userID,
+				Content: sql.NullString{String: "Hello, world! This is my first post", Valid: true},
+				UserID:  userID,
 			},
 		},
 		{
 			name: "should create a post without content",
 			post: CreatePostParams{
-				Content: sql.NullString{},	
-				UserID: userID,
+				Content:        sql.NullString{},
+				UserID:         userID,
 				OriginalPostID: sql.NullInt64{Int64: originalPost.ID, Valid: true},
 			},
 		},
 		{
 			name: "should create a post with original content",
 			post: CreatePostParams{
-				Content: sql.NullString{},	
-				UserID: userID,
+				Content: sql.NullString{},
+				UserID:  userID,
 			},
 		},
 	}
