@@ -1,11 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
+	"time"
 
+	"github.com/Jonss/posterr/api/httpapi"
 	"github.com/Jonss/posterr/config"
 	"github.com/Jonss/posterr/db"
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -25,7 +28,25 @@ func main() {
 			log.Fatalf("key 'SHOULD_MIGRATE' is (%t) but migration failed: error=(%v)", cfg.ShouldMigrate, err)
 		}
 	}
-	
-	// TODO: set server and set querier as param
-	fmt.Println("Hello, Posterr!")
+
+	router := mux.NewRouter()
+
+	services := httpapi.Services{}
+	httpServer := httpapi.NewHttpServer(
+		router,
+		cfg,
+		services,
+	)
+	httpServer.Start()
+
+	addr := "0.0.0.0:"+cfg.Port
+	server := &http.Server{
+		Handler: router,
+		Addr:   addr,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Println("Posterr Server started!")
+	log.Fatal(server.ListenAndServe())
 }
