@@ -17,6 +17,8 @@ func TestFetchPosts(t *testing.T) {
 		name string
 		arg FetchPostsParams
 		wantPosts int
+		wantHasNext bool
+		wantHasPrev bool
 	}{
 		{
 			name: "should fetch empty posts lists when user has no post and want to see its posts",
@@ -29,7 +31,7 @@ func TestFetchPosts(t *testing.T) {
 		{
 			name: "should fetch 3 posts with original_post",
 			arg: FetchPostsParams{
-				UserID: userWithThreePosts(ctx, querier, t),
+				UserID: userWithThreePosts(ctx, querier, t, "three_posts"),
 				Page: 0,
 				Size: 5,
 				IsOnlyMyPosts: true,
@@ -49,24 +51,51 @@ func TestFetchPosts(t *testing.T) {
 			wantPosts: 1,
 		},
 		{
-			name: "should fetch posts with page and size",
+			name: "should fetch no posts when page is 3 and size is 3",
+			arg: FetchPostsParams{
+				UserID: userWithThreePosts(context.Background(), querier, t, "page_1"),
+				Page: 3,
+				Size: 3,
+				IsOnlyMyPosts: true,
+			},
+			wantPosts: 0,
+			wantHasPrev: true,
+		},
+		{
+			name: "should fetch posts and contain hasNext as true",
+			arg: FetchPostsParams{
+				UserID: userWithTenPosts(ctx, querier, t),
+				Page: 0,
+				Size: 5,
+				IsOnlyMyPosts: true,
+			},
+			wantPosts: 5,
+			wantHasNext: true,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			fetchPosts, err := querier.FetchPosts(ctx, tc.arg)
+			got, err := querier.FetchPosts(ctx, tc.arg)
 			if err != nil {
 				t.Fatalf("unexpected error=(%v)", err)
 			}
-			if tc.wantPosts != len(fetchPosts.Posts) {
-				t.Fatalf("want %v, got %v", tc.wantPosts, len(fetchPosts.Posts))
+			if tc.wantPosts != len(got.Posts) {
+				t.Fatalf("len(Posts) want %v, got %v", tc.wantPosts, len(got.Posts))
+			}
+
+			if tc.wantHasNext != got.HasNext {
+				t.Fatalf("HasNext want %v, got %v", tc.wantHasNext, got.HasNext)
+			}
+			
+			if tc.wantHasPrev != got.HasPrev {
+				t.Fatalf("HasNext want %v, got %v", tc.wantHasPrev, got.HasPrev)
 			}
 		})
 	}
 }
 
-func userWithThreePosts(ctx context.Context, querier *Queries, t *testing.T) int64 {
-	userID, err := querier.SeedUser(ctx, "three_posts")
+func userWithThreePosts(ctx context.Context, querier *Queries, t *testing.T, username string) int64 {
+	userID, err := querier.SeedUser(ctx, username)
 	if err != nil {
 		t.Fatalf("error seeding user. error=(%v)", err)
 	}
@@ -105,7 +134,11 @@ func userWithPostsOn2021And2022(ctx context.Context, querier *Queries, t *testin
 		t.Fatalf("error seeding user. error=(%v)", err)
 	}
 
-	postDates := []time.Time{parsedDate("2021-05-02", t), parsedDate("2021-12-31", t), parsedDate("2022-05-02", t)}
+	postDates := []time.Time{
+		parsedDate("2021-05-02", t),
+		parsedDate("2021-12-31", t),
+		parsedDate("2022-05-02", t),
+	}
 	for _, pd := range postDates {
 		_, err := querier.SeedPost(ctx,SeedPostParams{
 			Content: sql.NullString{String: "a post on ", Valid: true},
@@ -113,6 +146,26 @@ func userWithPostsOn2021And2022(ctx context.Context, querier *Queries, t *testin
 			CreatedAt: pd,
 		})
 		
+		if err != nil {
+			t.Fatalf("error creating post. error=(%v).", err)
+		}
+	}
+	return userID
+}
+
+func userWithTenPosts(ctx context.Context, querier *Queries, t *testing.T) int64 {
+	userID, err := querier.SeedUser(ctx, "five_posts")
+	if err != nil {
+		t.Fatalf("error seeding user. error=(%v)", err)
+	}
+
+	postIds := make([]int64, 10)
+	for i := 0; i < len(postIds); i++ {
+
+		_, err := querier.CreatePost(ctx, CreatePostParams{
+			Content: sql.NullString{String: "Original post", Valid: true},
+			UserID: userID,
+		})
 		if err != nil {
 			t.Fatalf("error creating post. error=(%v).", err)
 		}

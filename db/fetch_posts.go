@@ -7,7 +7,7 @@ import (
 )
 
 const fetchPosts = `
-	SELECT 
+	SELECT
 		p1.id, p1.content, p1.user_id,
 		p1.original_post_id,
 		p1.created_at,
@@ -47,6 +47,7 @@ type FetchPost struct {
 type FetchPosts struct {
 	Posts []FetchPost
 	HasNext bool
+	HasPrev bool
 }
 
 func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPosts, error) {
@@ -73,8 +74,8 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 		count++
 	}
 
-	query = fmt.Sprintf("%s  ORDER BY p1.id DESC LIMIT %d OFFSET %d", query, arg.Size, arg.Page)
-	fmt.Println(query)
+	query = fmt.Sprintf("%s ORDER BY p1.id DESC LIMIT %d OFFSET %d", query, arg.Size, arg.Page)
+
 	rows, err := q.db.QueryContext(ctx, query, values...)
 	if err != nil {
 		return FetchPosts{}, err
@@ -83,27 +84,31 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 	for rows.Next() {
 		var p1 DetailedPost
 		var p2 DetailedPost
-		// p1.id, p1.content, p1.user_id,
-		// p1.original_post_id,
-		// p1.created_at,
-		// u1.username,
-		// p2.id, p2.content, p2.user_id,
-		// p2.original_post_id,
-		// p2.created_at,
-		// u2.username
-		rows.Scan(&p1.ID,&p1.Content,&p1.OriginalPostID, &p1.CreatedAt, p1.Username,
-			&p2.ID,&p2.Content,&p2.OriginalPostID, &p2.CreatedAt, p2.Username)
+
+		rows.Scan(
+			&p1.ID,
+			&p1.Content,
+			&p1.OriginalPostID,
+			&p1.CreatedAt,
+			&p1.Username,
+			&p2.ID,
+			&p2.Content,
+			&p2.OriginalPostID,
+			&p2.CreatedAt,
+			&p2.Username,
+		)
 
 		f := FetchPost{Post: p1, OriginalPost: &p2 }
 		posts = append(posts, f)
 	}
 
-	p := FetchPosts{
+	fetchPosts := FetchPosts{
 		Posts: posts,
-		HasNext: len(posts) != arg.Size,
+		HasNext: len(posts) > 0 && len(posts) == arg.Size,
+		HasPrev: arg.Page > 0,
 	}
 
-	return p, nil	
+	return fetchPosts, nil
 }
 
 func andOrWhere(length int) string {
