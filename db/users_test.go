@@ -12,11 +12,11 @@ func TestSeedUsers(t *testing.T) {
 
 	ctx := context.Background()
 
-	users := []SeedUserParams{
-		{1, "fferdinand"},
-		{2, "fjosef"},
-		{3, "sissi"},
-		{4, "maximilian"},
+	users := []string{
+		"fferdinand",
+		"fjosef",
+		"sissi",
+		"maximilian",
 	}
 	for _, u := range users {
 		if _, err := querier.SeedUser(ctx, u); err != nil {
@@ -27,28 +27,23 @@ func TestSeedUsers(t *testing.T) {
 	testCases := []struct{
 		name string
 		username string
-		wantID int
 		wantErr error
 	} {
 		{
 			name: "should find user fferdinand",
 			username: "fferdinand",
-			wantID: 1,
 		},
 		{
 			name: "should find user fjosef",
 			username: "fjosef",
-			wantID: 2,
 		},
 		{
 			name: "should find user sissi",
 			username: "sissi",
-			wantID: 3,
 		},
 		{
 			name: "should find user maximilian",
 			username: "maximilian",
-			wantID: 4,
 		},
 		{
 			name: "should not find user connor_mcleod",
@@ -61,20 +56,16 @@ func TestSeedUsers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			query := "select id, username from users where username = $1"
 			row := querier.db.QueryRowContext(ctx, query, tc.username)
-			var user User
-			err := row.Scan(&user.ID, &user.Username)
+			var got User
+			err := row.Scan(&got.ID, &got.Username)
 		
 			if err != nil && err != tc.wantErr {
 				t.Fatalf("err = %v, want %v", tc.wantErr, err)
 			}
 
 			if err == nil {
-				if user.ID != int64(tc.wantID) {
-					t.Fatalf("err = %v, want %v", user.ID, tc.wantID)
-				}
-	
-				if user.Username != tc.username {
-					t.Fatalf("username = %v, want %v", user.Username, tc.username)
+				if got.Username != tc.username {
+					t.Fatalf("username = %v, want %v", got.Username, tc.username)
 				}
 			}	
 		})

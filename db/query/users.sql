@@ -1,2 +1,2 @@
 -- name: SeedUser :one
-INSERT INTO users(id, username) VALUES ($1, $2) returning id;
+INSERT INTO users(username) VALUES ($1) returning id;

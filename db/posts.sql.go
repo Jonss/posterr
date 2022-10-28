@@ -6,6 +6,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createPost = `-- name: CreatePost :one
@@ -17,13 +18,46 @@ INSERT INTO posts(
 `
 
 type CreatePostParams struct {
-	Content        sql.NullString `json:"content"`
-	UserID         int64          `json:"user_id"`
-	OriginalPostID sql.NullInt64  `json:"original_post_id"`
+	Content        sql.NullString
+	UserID         int64
+	OriginalPostID sql.NullInt64
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
 	row := q.db.QueryRowContext(ctx, createPost, arg.Content, arg.UserID, arg.OriginalPostID)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Content,
+		&i.UserID,
+		&i.OriginalPostID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const seedPost = `-- name: SeedPost :one
+INSERT INTO posts(
+    content, user_id, original_post_id, created_at
+) VALUES (
+    $1, $2, $3, $4
+) RETURNING id, content, user_id, original_post_id, created_at
+`
+
+type SeedPostParams struct {
+	Content        sql.NullString
+	UserID         int64
+	OriginalPostID sql.NullInt64
+	CreatedAt      time.Time
+}
+
+func (q *Queries) SeedPost(ctx context.Context, arg SeedPostParams) (Post, error) {
+	row := q.db.QueryRowContext(ctx, seedPost,
+		arg.Content,
+		arg.UserID,
+		arg.OriginalPostID,
+		arg.CreatedAt,
+	)
 	var i Post
 	err := row.Scan(
 		&i.ID,

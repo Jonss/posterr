@@ -8,16 +8,11 @@ import (
 )
 
 const seedUser = `-- name: SeedUser :one
-INSERT INTO users(id, username) VALUES ($1, $2) returning id
+INSERT INTO users(username) VALUES ($1) returning id
 `
 
-type SeedUserParams struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-}
-
-func (q *Queries) SeedUser(ctx context.Context, arg SeedUserParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, seedUser, arg.ID, arg.Username)
+func (q *Queries) SeedUser(ctx context.Context, username string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, seedUser, username)
 	var id int64
 	err := row.Scan(&id)
 	return id, err

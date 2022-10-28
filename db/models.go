@@ -8,15 +8,15 @@ import (
 )
 
 type Post struct {
-	ID             int64          `json:"id"`
-	Content        sql.NullString `json:"content"`
-	UserID         int64          `json:"user_id"`
-	OriginalPostID sql.NullInt64  `json:"original_post_id"`
-	CreatedAt      time.Time      `json:"created_at"`
+	ID             int64
+	Content        sql.NullString
+	UserID         int64
+	OriginalPostID sql.NullInt64
+	CreatedAt      time.Time
 }
 
 type User struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int64
+	Username  string
+	CreatedAt time.Time
 }

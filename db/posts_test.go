@@ -11,7 +11,7 @@ func TestCreatePost(t *testing.T) {
 	defer tearDown()
 
 	ctx := context.Background()
-	userID, err := querier.SeedUser(ctx, SeedUserParams{Username: "jupiter"})
+	userID, err := querier.SeedUser(ctx, "jupiter")
 	if err != nil {
 		t.Fatalf("error seeding user. error=(%v)", err)
 	}

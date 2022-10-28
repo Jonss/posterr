@@ -8,7 +8,8 @@ import (
 
 type Querier interface {
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
-	SeedUser(ctx context.Context, arg SeedUserParams) (int64, error)
+	SeedPost(ctx context.Context, arg SeedPostParams) (Post, error)
+	SeedUser(ctx context.Context, username string) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

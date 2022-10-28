@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/jonss/testcontainers-go-wrapper/pg"
 )
@@ -41,4 +42,17 @@ func newDbTestSetup(t *testing.T) (*Queries, func()) {
 	}
 
 	return New(dbConn), pgInfo.TearDown
+}
+
+func parsedDate(dateStr string, t *testing.T) time.Time {
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		t.Fatalf("error creating users. error=(%v)", err)
+	}
+	return date
+}
+
+func parsedDatePtr(dateStr string, t *testing.T) *time.Time {
+	d := parsedDate(dateStr, t)
+	return &d
 }
