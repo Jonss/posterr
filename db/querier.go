@@ -7,6 +7,7 @@ import (
 )
 
 type Querier interface {
+	CountPosts(ctx context.Context, arg CountPostsParams) (int64, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	SeedPost(ctx context.Context, arg SeedPostParams) (Post, error)
 	SeedUser(ctx context.Context, username string) (int64, error)

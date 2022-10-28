@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"testing"
+	"time"
 )
 
 func TestCreatePost(t *testing.T) {
@@ -70,5 +71,82 @@ func TestCreatePost(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestCountPosts(t *testing.T) {
+	querier, tearDown := newDbTestSetup(t)
+	defer tearDown()
+
+	ctx := context.Background()
+	tenDaysAgo := time.Now().AddDate(0, 0, -10)
+
+	testCases := []struct{
+		name string
+		username string
+		times int
+		wantTimes int64
+		date *time.Time
+	} {
+		{
+			name: "should count 10 posts today",
+			username: "10posts",
+			times: 10,
+			wantTimes: 10,
+		},
+		{
+			name: "should count 0 posts today when user has old posts",
+			username: "0poststoday",
+			times: 10,
+			wantTimes: 0,
+			date: &tenDaysAgo,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			userID := buildPosts(ctx, t, querier, tc.times, tc.username, tc.date)
+			
+			today := time.Now()
+			local := time.Local
+			start := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, local)
+			end := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 59, local)
+			
+			got, err := querier.CountPosts(ctx, CountPostsParams{
+				UserID: userID,
+				CreatedAt: start,
+				CreatedAt_2: end,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error. error=(%v)", err)
+			}
+			if got != tc.wantTimes {
+				t.Fatalf("CountPosts() want %v, got %v", tc.wantTimes, got)
+			}
+		})
+	}
+}
+
+func buildPosts(ctx context.Context, t *testing.T,  querier *Queries, times int, username string, date *time.Time) int64 {
+	userID, err := querier.SeedUser(ctx, username)
+	if err != nil {
+		t.Fatalf("error seeding user. error=(%v)", err)
+	}
+	if date == nil {
+		now := time.Now()
+		date = &now
+	}
+
+	for i := 0; i < times; i++ {
+		_, err := querier.SeedPost(ctx, SeedPostParams{
+			Content: sql.NullString{String: "A post", Valid: true},
+			UserID:  userID,
+			CreatedAt: *date,
+		})
+		
+		if err != nil {
+			t.Fatalf("error creating originalPost. error=(%v)", err)
+		}
+	}
+	
+
+	return userID
 }

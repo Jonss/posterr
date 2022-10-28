@@ -9,6 +9,25 @@ import (
 	"time"
 )
 
+const countPosts = `-- name: CountPosts :one
+SELECT count(1) FROM posts
+WHERE user_id = $1
+AND created_at BETWEEN $2 AND $3
+`
+
+type CountPostsParams struct {
+	UserID      int64
+	CreatedAt   time.Time
+	CreatedAt_2 time.Time
+}
+
+func (q *Queries) CountPosts(ctx context.Context, arg CountPostsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countPosts, arg.UserID, arg.CreatedAt, arg.CreatedAt_2)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts(
     content, user_id, original_post_id
