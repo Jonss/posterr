@@ -45,4 +45,5 @@ func (h *HttpServer) Start() {
 func (h *HttpServer) routes() {
 	api := h.router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/posts", h.FetchPosts()).Methods(http.MethodGet)
+	api.HandleFunc("/posts", h.CreatePost()).Methods(http.MethodPost)
 }

@@ -2,10 +2,24 @@ package post
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/Jonss/posterr/db"
-	"github.com/Jonss/posterr/pkg/strings"
+	"github.com/Jonss/posterr/pkg/utils"
+)
+
+const (
+	maxPostsDaily = 5
+)
+
+var ErrMaxPostsDailyAchieved = errors.New(fmt.Sprintf("error user is not allowed to post more than %d", maxPostsDaily))
+
+var (
+	today         = time.Now()
+	startOfTheDay = time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, time.UTC)
+	endOfTheDay   = time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 59, time.UTC)
 )
 
 type FetchPostParams struct {
@@ -74,7 +88,7 @@ func (s *service) FetchPosts(ctx context.Context, arg FetchPostParams) (FetchPos
 		fetchPosts[i] = FetchPost{
 			Post: Post{
 				ID:        p.Post.ID,
-				Message:   strings.NullStrToPointer(p.Post.Content),
+				Message:   utils.NullStrToPointer(p.Post.Content),
 				Username:  p.Post.Username,
 				CreatedAt: p.Post.CreatedAt,
 				Type:      getType(p),
@@ -91,13 +105,60 @@ func (s *service) FetchPosts(ctx context.Context, arg FetchPostParams) (FetchPos
 	return response, nil
 }
 
+func (s *service) CountDailyPosts(ctx context.Context, userId int64) error {
+	count, err := s.queries.CountPosts(ctx, db.CountPostsParams{
+		UserID:      userId,
+		CreatedAt:   startOfTheDay,
+		CreatedAt_2: endOfTheDay,
+	})
+	if err != nil {
+		return err
+	}
+	if count >= maxPostsDaily {
+		return ErrMaxPostsDailyAchieved
+	}
+
+	return nil
+}
+
+type CreatePostParams struct {
+	UserID         int64
+	Message        *string
+	OriginalPostID *int64
+}
+
+type CreatePostResponse struct {
+	ID             int64
+	Content        *string
+	OriginalPostID *int64
+	CreatedAt      time.Time
+}
+
+func (s *service) CreatePost(ctx context.Context, arg CreatePostParams) (*CreatePostResponse, error) {
+	dbPost, err := s.queries.CreatePost(ctx, db.CreatePostParams{
+		UserID:         arg.UserID,
+		Content:        utils.StrPtrToNullStr(arg.Message),
+		OriginalPostID: utils.Int64PtrToNullInt64(arg.OriginalPostID),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreatePostResponse{
+		ID:             dbPost.ID,
+		Content:        utils.NullStrToPointer(dbPost.Content),
+		CreatedAt:      dbPost.CreatedAt,
+		OriginalPostID: utils.NullInt64ToInt64Ptr(dbPost.OriginalPostID),
+	}, nil
+}
+
 func buildOriginalPost(p *db.DetailedPost) *Post {
 	if p == nil {
 		return nil
 	}
 	return &Post{
 		ID:        p.Post.ID,
-		Message:   strings.NullStrToPointer(p.Post.Content),
+		Message:   utils.NullStrToPointer(p.Post.Content),
 		Username:  p.Username,
 		CreatedAt: p.Post.CreatedAt,
 	}

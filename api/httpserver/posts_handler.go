@@ -1,12 +1,14 @@
 package httpserver
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Jonss/posterr/pkg/post"
-	"github.com/Jonss/posterr/pkg/strings"
+	"github.com/Jonss/posterr/pkg/utils"
 )
 
 var (
@@ -80,23 +82,79 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 	}
 }
 
+type CreatePostRequest struct {
+	UserID         int64   `json:"user_id" validate:"required"`
+	Message        *string `json:"message" validate:"required,lte=778"`
+	OriginalPostID *int64  `json:"originalPostId"`
+}
+
+type CreatePostResponse struct {
+	ID             int64     `json:"id"`
+	Message        *string   `json:"message"`
+	OriginalPostID *int64    `json:"originalPostId"`
+	CreatedAt      time.Time `json:"createdAt"`
+}
+
+func (s *HttpServer) CreatePost() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		var req CreatePostRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			apiResponse(w, http.StatusBadRequest, nil)
+			return
+		}
+
+		err := s.restValidator.Validator.Struct(req)
+		if err != nil {
+			validateRequestBody(err, w, s.restValidator.Translator)
+			return
+		}
+		// checks if user can post in the day
+		err = s.services.PostService.CountDailyPosts(ctx, req.UserID)
+		if err != nil {
+			apiResponse(w, http.StatusUnprocessableEntity, NewValidationError(err.Error()))
+			return
+		}
+
+		cpResponse, err := s.services.PostService.CreatePost(ctx, post.CreatePostParams{
+			Message:        req.Message,
+			UserID:         int64(req.UserID),
+			OriginalPostID: req.OriginalPostID,
+		})
+		if err != nil {
+			// TODO: handle errors when original_post and user does not exists
+			apiResponse(w, http.StatusInternalServerError, NewValidationError(err.Error()))
+			return
+		}
+
+		response := CreatePostResponse{
+			ID:             cpResponse.ID,
+			CreatedAt:      cpResponse.CreatedAt,
+			Message:        cpResponse.Content,
+			OriginalPostID: cpResponse.OriginalPostID,
+		}
+
+		apiResponse(w, http.StatusCreated, response)
+	}
+}
+
 func fetchPostsParams(values url.Values) (post.FetchPostParams, error) {
-	endDate, err := strings.ParseStringToDate(values, "end_date")
+	endDate, err := utils.ParseStringToDate(values, "end_date")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
 
-	startDate, err := strings.ParseStringToDate(values, "start_date")
+	startDate, err := utils.ParseStringToDate(values, "start_date")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
 
-	onlyMine, err := strings.ParseStringToBool(values, "only_mine")
+	onlyMine, err := utils.ParseStringToBool(values, "only_mine")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
 
-	size, err := strings.ParseStringToInt(values, "size")
+	size, err := utils.ParseStringToInt(values, "size")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
@@ -104,12 +162,12 @@ func fetchPostsParams(values url.Values) (post.FetchPostParams, error) {
 		size = defaultPageSize
 	}
 
-	page, err := strings.ParseStringToInt(values, "page")
+	page, err := utils.ParseStringToInt(values, "page")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
 
-	userID, err := strings.ParseStringToInt(values, "user_id")
+	userID, err := utils.ParseStringToInt(values, "user_id")
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}

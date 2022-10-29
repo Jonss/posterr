@@ -16,6 +16,8 @@ func NewPostService(q db.AppQuerier) *service {
 
 type Service interface {
 	FetchPosts(ctx context.Context, arg FetchPostParams) (FetchPostResponse, error)
+	CountDailyPosts(ctx context.Context, userID int64) error
+	CreatePost(ctx context.Context, arg CreatePostParams) (*CreatePostResponse, error)
 }
 
 var _ Service = (*service)(nil)

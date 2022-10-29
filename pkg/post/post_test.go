@@ -9,7 +9,7 @@ import (
 	"github.com/Jonss/posterr/db"
 	mock_db "github.com/Jonss/posterr/db/mock"
 	"github.com/Jonss/posterr/pkg/post"
-	"github.com/Jonss/posterr/pkg/strings"
+	"github.com/Jonss/posterr/pkg/utils"
 	"github.com/golang/mock/gomock"
 )
 
@@ -118,9 +118,9 @@ func buildPost(
 }
 
 func fetchPosts() []db.FetchPost {
-	firstPost := buildPost("aemon", strings.StrToNullStr("Am I Aemon? Need to know!"), 1, 1)
+	firstPost := buildPost("aemon", utils.StrToNullStr("Am I Aemon? Need to know!"), 1, 1)
 	secondPost := buildPost("drogon", sql.NullString{}, 2, 2)
-	thirdPost := buildPost("vyserion", strings.StrToNullStr("that's a good question"), 3, 3)
+	thirdPost := buildPost("vyserion", utils.StrToNullStr("that's a good question"), 3, 3)
 
 	return []db.FetchPost{
 		{

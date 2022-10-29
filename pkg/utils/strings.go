@@ -1,4 +1,4 @@
-package strings
+package utils
 
 import (
 	"database/sql"
@@ -20,6 +20,13 @@ func NullStrToPointer(str sql.NullString) *string {
 
 func StrToNullStr(str string) sql.NullString {
 	return sql.NullString{String: str, Valid: true}
+}
+
+func StrPtrToNullStr(str *string) sql.NullString {
+	if str == nil {
+		return sql.NullString{}
+	}
+	return sql.NullString{String: *str, Valid: true}
 }
 
 func ParseStringToDate(values url.Values, key string) (*time.Time, error) {
