@@ -65,6 +65,21 @@ func (mr *MockAppQuerierMockRecorder) CreatePost(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePost", reflect.TypeOf((*MockAppQuerier)(nil).CreatePost), arg0, arg1)
 }
 
+// FetchPost mocks base method.
+func (m *MockAppQuerier) FetchPost(arg0 context.Context, arg1 int64) (*db.FetchPost, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchPost", arg0, arg1)
+	ret0, _ := ret[0].(*db.FetchPost)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchPost indicates an expected call of FetchPost.
+func (mr *MockAppQuerierMockRecorder) FetchPost(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchPost", reflect.TypeOf((*MockAppQuerier)(nil).FetchPost), arg0, arg1)
+}
+
 // FetchPosts mocks base method.
 func (m *MockAppQuerier) FetchPosts(arg0 context.Context, arg1 db.FetchPostsParams) (db.FetchPosts, error) {
 	m.ctrl.T.Helper()

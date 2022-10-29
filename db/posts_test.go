@@ -106,9 +106,8 @@ func TestCountPosts(t *testing.T) {
 			userID := buildPosts(ctx, t, querier, tc.times, tc.username, tc.date)
 
 			today := time.Now()
-			local := time.Local
-			start := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, local)
-			end := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 59, local)
+			start := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, time.UTC)
+			end := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 59, time.UTC)
 
 			got, err := querier.CountPosts(ctx, CountPostsParams{
 				UserID:      userID,

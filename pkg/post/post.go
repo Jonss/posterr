@@ -14,7 +14,7 @@ const (
 	maxPostsDaily = 5
 )
 
-var ErrMaxPostsDailyAchieved = errors.New(fmt.Sprintf("error user is not allowed to post more than %d times within a day", maxPostsDaily))
+var ErrMaxPostsDailyAchieved = fmt.Errorf("error user is not allowed to post more than %d times within a day", maxPostsDaily)
 
 var (
 	today         = time.Now()
@@ -134,7 +134,24 @@ type CreatePostResponse struct {
 	CreatedAt      time.Time
 }
 
+func (arg CreatePostParams) getType() PostType {
+	hasMessage := arg.Message != nil
+	hasOriginalPost := arg.OriginalPostID != nil
+	if hasOriginalPost && !hasMessage {
+		return Reposting
+	}
+	if hasOriginalPost && hasMessage {
+		return QuotePost
+	}
+	return Original
+}
+
 func (s *service) CreatePost(ctx context.Context, arg CreatePostParams) (*CreatePostResponse, error) {
+	err := handleOriginalPost(ctx, s.queries, arg)
+	if err != nil {
+		return nil, err
+	}
+
 	dbPost, err := s.queries.CreatePost(ctx, db.CreatePostParams{
 		UserID:         arg.UserID,
 		Content:        utils.StrPtrToNullStr(arg.Message),
@@ -162,4 +179,23 @@ func buildOriginalPost(p *db.DetailedPost) *Post {
 		Username:  p.Username,
 		CreatedAt: p.Post.CreatedAt,
 	}
+}
+
+func handleOriginalPost(ctx context.Context, q db.AppQuerier, arg CreatePostParams) error {
+	if arg.OriginalPostID != nil {
+		originalPost, err := q.FetchPost(ctx, *arg.OriginalPostID)
+		if err != nil {
+			return err
+		}
+		if originalPost != nil {
+			newPostType := arg.getType()
+			if newPostType == getType(*originalPost) {
+				if newPostType == Reposting {
+					return errors.New("error user cannot repost an existing repost")
+				}
+				return errors.New("error user cannot quote an existing quote-post")
+			}
+		}
+	}
+	return nil
 }

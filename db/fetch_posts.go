@@ -125,3 +125,37 @@ func andOrWhere(length int) string {
 	}
 	return "WHERE"
 }
+
+func (q *Queries) FetchPost(ctx context.Context, ID int64) (*FetchPost, error) {
+	query := fmt.Sprintf("%s WHERE p1.id = $1", fetchPosts)
+	row := q.db.QueryRowContext(ctx, query, ID)
+
+	var p1 DetailedPost
+	var p2 DetailedPost
+
+	err := row.Scan(
+		&p1.ID,
+		&p1.Content,
+		&p1.UserID,
+		&p1.OriginalPostID,
+		&p1.CreatedAt,
+		&p1.Username,
+		&p2.ID,
+		&p2.Content,
+		&p2.UserID,
+		&p2.OriginalPostID,
+		&p2.CreatedAt,
+		&p2.Username,
+	)
+	var originalPost *DetailedPost
+	if p2.ID == 0 {
+		originalPost = nil
+	} else {
+		originalPost = &p2
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &FetchPost{Post: p1, OriginalPost: originalPost}, nil
+}

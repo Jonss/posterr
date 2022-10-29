@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/Jonss/posterr/pkg/utils"
 )
 
 func TestFetchPosts(t *testing.T) {
@@ -126,6 +128,67 @@ func TestFetchPosts(t *testing.T) {
 				}
 				start--
 				end++
+			}
+		})
+	}
+}
+
+func TestFetchPost(t *testing.T) {
+	querier, tearDown := newDbTestSetup(t)
+	defer tearDown()
+
+	ctx := context.Background()
+
+	userID, err := querier.SeedUser(ctx, "thunder")
+	if err != nil {
+		t.Fatalf("error creating user. error=(%v).", err)
+	}
+
+	originalPost, err := querier.SeedPost(ctx, SeedPostParams{
+		Content:   utils.StrToNullStr("originalPost"),
+		UserID:    userID,
+		CreatedAt: time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("error creating originalPost. error=(%v).", err)
+	}
+
+	post, err := querier.SeedPost(ctx, SeedPostParams{
+		Content:        utils.StrToNullStr("originalPost"),
+		OriginalPostID: utils.Int64PtrToNullInt64(&originalPost.ID),
+		UserID:         userID,
+		CreatedAt:      time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("error creating post. error=(%v).", err)
+	}
+
+	testCases := []struct {
+		name string
+		post Post
+	}{
+		{
+			name: "should fetch post",
+			post: post,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := querier.FetchPost(ctx, tc.post.ID)
+			if err != nil {
+				t.Fatalf("unexpected error fetching post. error=(%v)", err)
+			}
+			if tc.post.ID != got.Post.ID {
+				t.Errorf("Post.ID want %v, got %v", tc.post.ID, got.Post.ID)
+			}
+			if tc.post.Content != got.Post.Content {
+				t.Errorf("Post.Content want %v, got %v", tc.post.Content, got.Post.Content)
+			}
+			if tc.post.OriginalPostID != got.Post.OriginalPostID {
+				t.Errorf("Post.OriginalPostID want %v, got %v", tc.post.OriginalPostID, got.Post.OriginalPostID)
+			}
+			if tc.post.UserID != got.Post.UserID {
+				t.Errorf("Post.ID want %v, got %v", tc.post.ID, got.Post.ID)
 			}
 		})
 	}
