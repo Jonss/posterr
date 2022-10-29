@@ -18,9 +18,10 @@ var (
 )
 
 type Post struct {
-	ID      int64         `json:"id"`
-	Message *string       `json:"message"`
-	Type    post.PostType `json:"type"`
+	ID       int64         `json:"id"`
+	Message  *string       `json:"message"`
+	Type     post.PostType `json:"type"`
+	Username string        `json:"username"`
 }
 
 type OriginalPost struct {
@@ -46,7 +47,7 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 
 		params, err := fetchPostsParams(r.URL.Query())
 		if err != nil {
-			apiResponse(w, http.StatusBadRequest, err)
+			apiResponse(w, http.StatusBadRequest, NewErrorResponses(ErrorResponse{Message: err.Error()}))
 			return
 		}
 		fetchPostsResponse, err := s.services.PostService.FetchPosts(ctx, params)
@@ -60,9 +61,10 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 		for i, fp := range fetchPosts {
 			posts[i] = FetchPostResponse{
 				Post: Post{
-					ID:      fp.Post.ID,
-					Message: fp.Post.Message,
-					Type:    fp.Post.Type,
+					ID:       fp.Post.ID,
+					Message:  fp.Post.Message,
+					Type:     fp.Post.Type,
+					Username: fp.Post.Username,
 				},
 				OriginalPost: newOriginalPost(fp.OriginalPost),
 			}

@@ -100,17 +100,5 @@ func buildOriginalPost(p *db.DetailedPost) *Post {
 		Message:   strings.NullStrToPointer(p.Post.Content),
 		Username:  p.Username,
 		CreatedAt: p.Post.CreatedAt,
-		Type:      originalPostType(p),
 	}
-}
-
-func originalPostType(op *db.DetailedPost) PostType {
-	if op == nil {
-		return Original
-	}
-	originalPost := *op
-	fp := db.FetchPost{
-		Post: originalPost,
-	}
-	return getType(fp)
 }

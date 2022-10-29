@@ -9,6 +9,7 @@
 ### Libraries used in this project: [TODO]
 
 - [gorilla/mux](https://github.com/gorilla/mux)
+- [viper](https://github.com/spf13/viper)
 - [sqlc](https://github.com/kyleconroy/sqlc)
 - [mockgen](https://github.com/golang/mock)
 - [testcontainers-go-wrapper](http://github.com/jonss/testcontainers-go-wrapper)

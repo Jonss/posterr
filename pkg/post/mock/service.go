@@ -36,10 +36,10 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // FetchPosts mocks base method.
-func (m *MockService) FetchPosts(arg0 context.Context, arg1 post.FetchPostParams) ([]post.FetchPost, error) {
+func (m *MockService) FetchPosts(arg0 context.Context, arg1 post.FetchPostParams) (post.FetchPostResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FetchPosts", arg0, arg1)
-	ret0, _ := ret[0].([]post.FetchPost)
+	ret0, _ := ret[0].(post.FetchPostResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
