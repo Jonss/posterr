@@ -9,8 +9,7 @@ func Int64PtrToNullInt64(n *int64) sql.NullInt64 {
 	return sql.NullInt64{Int64: *n, Valid: true}
 }
 
-
-func NullInt64ToInt64Ptr(n sql.NullInt64 ) *int64 {
+func NullInt64ToInt64Ptr(n sql.NullInt64) *int64 {
 	if !n.Valid {
 		return nil
 	}

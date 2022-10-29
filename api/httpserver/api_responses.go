@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 const contentType = "Content-Type"
@@ -35,4 +36,8 @@ func NewErrorResponses(errors ...ErrorResponse) ErrorResponses {
 	var errResponses []ErrorResponse
 	errResponses = append(errResponses, errors...)
 	return ErrorResponses{errResponses}
+}
+
+func NewErrorResponse(message string) ErrorResponse {
+	return ErrorResponse{Message: strings.ToLower(message)}
 }

@@ -3,7 +3,6 @@ package httpserver
 import (
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -35,11 +34,7 @@ func validateRequestBody(err error, w http.ResponseWriter, translator ut.Transla
 	validationErrors := err.(validator.ValidationErrors)
 	errorResponses := make([]ErrorResponse, len(validationErrors))
 	for i, vErr := range validationErrors {
-		errorResponses[i] = NewValidationError(vErr.Translate(translator))
+		errorResponses[i] = NewErrorResponse(vErr.Translate(translator))
 	}
 	apiResponse(w, http.StatusBadRequest, NewErrorResponses(errorResponses...))
-}
-
-func NewValidationError(message string) ErrorResponse {
-	return ErrorResponse{Message: strings.ToLower(message)}
 }

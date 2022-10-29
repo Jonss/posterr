@@ -84,7 +84,7 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 
 type CreatePostRequest struct {
 	UserID         int64   `json:"user_id" validate:"required"`
-	Message        *string `json:"message" validate:"required,lte=778"`
+	Message        *string `json:"message" validate:"required,lte=777"`
 	OriginalPostID *int64  `json:"originalPostId"`
 }
 
@@ -112,7 +112,7 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 		// checks if user can post in the day
 		err = s.services.PostService.CountDailyPosts(ctx, req.UserID)
 		if err != nil {
-			apiResponse(w, http.StatusUnprocessableEntity, NewValidationError(err.Error()))
+			apiResponse(w, http.StatusUnprocessableEntity, NewErrorResponses(NewErrorResponse(err.Error())))
 			return
 		}
 
@@ -123,7 +123,7 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 		})
 		if err != nil {
 			// TODO: handle errors when original_post and user does not exists
-			apiResponse(w, http.StatusInternalServerError, NewValidationError(err.Error()))
+			apiResponse(w, http.StatusInternalServerError, NewErrorResponse(err.Error()))
 			return
 		}
 

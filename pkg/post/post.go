@@ -14,7 +14,7 @@ const (
 	maxPostsDaily = 5
 )
 
-var ErrMaxPostsDailyAchieved = errors.New(fmt.Sprintf("error user is not allowed to post more than %d", maxPostsDaily))
+var ErrMaxPostsDailyAchieved = errors.New(fmt.Sprintf("error user is not allowed to post more than %d times within a day", maxPostsDaily))
 
 var (
 	today         = time.Now()

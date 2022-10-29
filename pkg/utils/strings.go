@@ -18,6 +18,10 @@ func NullStrToPointer(str sql.NullString) *string {
 	return &str.String
 }
 
+func StrToPointer(str string) *string {
+	return &str
+}
+
 func StrToNullStr(str string) sql.NullString {
 	return sql.NullString{String: str, Valid: true}
 }
