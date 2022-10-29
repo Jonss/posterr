@@ -22,12 +22,12 @@ func StrToNullStr(str string) sql.NullString {
 	return sql.NullString{String: str, Valid: true}
 }
 
-func ParseStringToDate(values url.Values, key string ) (*time.Time, error) {
+func ParseStringToDate(values url.Values, key string) (*time.Time, error) {
 	value := values[key]
 	if len(value) == 0 {
 		return nil, nil
 	}
-	
+
 	endDate, err := time.Parse(dateFormat, value[0])
 	if err != nil {
 		return &time.Time{}, err

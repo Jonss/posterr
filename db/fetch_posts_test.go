@@ -18,14 +18,14 @@ func TestFetchPosts(t *testing.T) {
 	threePostsID, threePosts := userWithThreePosts(ctx, querier, t, "three_posts")
 	postsInTwoYearsID, postsInTwoYears := userWithPostsOn2021And2022(ctx, querier, t)
 	tenPostsID, tenPosts := userWithTenPosts(ctx, querier, t)
-	
+
 	testCases := []struct {
-		name        string
-		arg         FetchPostsParams
-		wantPostsQty   int
-		wantHasNext bool
-		wantHasPrev bool
-		wantPosts []Post
+		name         string
+		arg          FetchPostsParams
+		wantPostsQty int
+		wantHasNext  bool
+		wantHasPrev  bool
+		wantPosts    []Post
 	}{
 		{
 			name: "should fetch empty posts lists when user has no post and want to see its posts",
@@ -44,7 +44,7 @@ func TestFetchPosts(t *testing.T) {
 				IsOnlyMyPosts: true,
 			},
 			wantPostsQty: 3,
-			wantPosts: threePosts,
+			wantPosts:    threePosts,
 		},
 		{
 			name: "should fetch posts within 2022 only",
@@ -57,7 +57,7 @@ func TestFetchPosts(t *testing.T) {
 				IsOnlyMyPosts: true,
 			},
 			wantPostsQty: 1,
-			wantPosts: postsInTwoYears,
+			wantPosts:    postsInTwoYears,
 		},
 		{
 			name: "should fetch no posts when page is 3 and size is 3",
@@ -67,9 +67,9 @@ func TestFetchPosts(t *testing.T) {
 				Size:          3,
 				IsOnlyMyPosts: true,
 			},
-			wantPostsQty:   0,
-			wantHasPrev: true,
-			wantPosts: page3Posts,
+			wantPostsQty: 0,
+			wantHasPrev:  true,
+			wantPosts:    page3Posts,
 		},
 		{
 			name: "should fetch posts and contain hasNext as true",
@@ -79,9 +79,9 @@ func TestFetchPosts(t *testing.T) {
 				Size:          5,
 				IsOnlyMyPosts: true,
 			},
-			wantPostsQty:   5,
-			wantHasNext: true,
-			wantPosts: tenPosts[5:], // subslice to check latest posts
+			wantPostsQty: 5,
+			wantHasNext:  true,
+			wantPosts:    tenPosts[5:], // subslice to check latest posts
 		},
 	}
 	for _, tc := range testCases {
@@ -102,7 +102,7 @@ func TestFetchPosts(t *testing.T) {
 				t.Fatalf("HasNext want %v, got %v", tc.wantHasPrev, got.HasPrev)
 			}
 
-			start := len(got.Posts)-1 // starts in the end because the query orders desc by id
+			start := len(got.Posts) - 1 // starts in the end because the query orders desc by id
 			end := 0
 
 			for start > end {

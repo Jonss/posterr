@@ -18,13 +18,13 @@ var (
 )
 
 type Post struct {
-	ID        int64 `json:"id"`
-	Message *string `json:"message"`
-	Type post.PostType `json:"type"`
+	ID      int64         `json:"id"`
+	Message *string       `json:"message"`
+	Type    post.PostType `json:"type"`
 }
 
 type OriginalPost struct {
-	ID        int64 `json:"id"`
+	ID      int64   `json:"id"`
 	Message *string `json:"message"`
 }
 
@@ -35,8 +35,8 @@ type FetchPostResponse struct {
 
 type FetchPostsResponse struct {
 	FetchPostResponses []FetchPostResponse `json:"content"`
-	HasNext bool `json:"hasNext"`
-	HasPrev bool `json:"hasPrev"`
+	HasNext            bool                `json:"hasNext"`
+	HasPrev            bool                `json:"hasPrev"`
 }
 
 // start_date=2022-05-02&end_date=2022-05-20&page=0&size=10&only_mine=true
@@ -57,12 +57,12 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 
 		fetchPosts := fetchPostsResponse.Posts
 		posts := make([]FetchPostResponse, len(fetchPosts))
-		for i, fp := range fetchPosts{
+		for i, fp := range fetchPosts {
 			posts[i] = FetchPostResponse{
 				Post: Post{
-					ID: fp.Post.ID,
+					ID:      fp.Post.ID,
 					Message: fp.Post.Message,
-					Type: fp.Post.Type,
+					Type:    fp.Post.Type,
 				},
 				OriginalPost: newOriginalPost(fp.OriginalPost),
 			}
@@ -70,10 +70,10 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 
 		response := FetchPostsResponse{
 			FetchPostResponses: posts,
-			HasNext: fetchPostsResponse.HasNext,
-			HasPrev: fetchPostsResponse.HasPrev,
+			HasNext:            fetchPostsResponse.HasNext,
+			HasPrev:            fetchPostsResponse.HasPrev,
 		}
-		
+
 		apiResponse(w, http.StatusOK, response)
 	}
 }
@@ -88,7 +88,7 @@ func fetchPostsParams(values url.Values) (post.FetchPostParams, error) {
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
-	
+
 	onlyMine, err := strings.ParseStringToBool(values, "only_mine")
 	if err != nil {
 		return post.FetchPostParams{}, err
@@ -106,7 +106,7 @@ func fetchPostsParams(values url.Values) (post.FetchPostParams, error) {
 	if err != nil {
 		return post.FetchPostParams{}, err
 	}
-	
+
 	userID, err := strings.ParseStringToInt(values, "user_id")
 	if err != nil {
 		return post.FetchPostParams{}, err
@@ -117,21 +117,21 @@ func fetchPostsParams(values url.Values) (post.FetchPostParams, error) {
 	}
 
 	return post.FetchPostParams{
-		UserID: int64(userID),
+		UserID:        int64(userID),
 		IsOnlyMyPosts: onlyMine,
-		Size: size,
-		Page: page,
-		StartDate: startDate,
-		EndDate: endDate,
+		Size:          size,
+		Page:          page,
+		StartDate:     startDate,
+		EndDate:       endDate,
 	}, nil
 }
 
-func newOriginalPost(op *post.Post) *OriginalPost{
+func newOriginalPost(op *post.Post) *OriginalPost {
 	if op == nil {
 		return nil
 	}
 	return &OriginalPost{
-		ID: op.ID,
+		ID:      op.ID,
 		Message: op.Message,
 	}
 }
