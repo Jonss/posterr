@@ -18,9 +18,9 @@ type Validator struct {
 
 func NewValidator() (*Validator, error) {
 	uni := ut.New(en.New())
-	translation, found := uni.GetTranslator("en")
-	if !found {
-		return nil, errors.New("error on get translador, 'en'not found")
+	translation, found := uni.GetTranslator("en_US")
+	if found {
+		return nil, errors.New("error on get translator, 'en_US'")
 	}
 	validate := validator.New()
 
@@ -41,5 +41,5 @@ func validateRequestBody(err error, w http.ResponseWriter, translator ut.Transla
 }
 
 func NewValidationError(message string) ErrorResponse {
-	return ErrorResponse{Code: "validation", Message: strings.ToLower(message)}
+	return ErrorResponse{Message: strings.ToLower(message)}
 }

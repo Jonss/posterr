@@ -88,17 +88,25 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 		rows.Scan(
 			&p1.ID,
 			&p1.Content,
+			&p1.UserID,
 			&p1.OriginalPostID,
 			&p1.CreatedAt,
 			&p1.Username,
 			&p2.ID,
 			&p2.Content,
+			&p2.UserID,
 			&p2.OriginalPostID,
 			&p2.CreatedAt,
 			&p2.Username,
 		)
+		var originalPost *DetailedPost
+		if p2.ID == 0 {
+			originalPost = nil
+		} else {
+			originalPost = &p2
+		}
 
-		f := FetchPost{Post: p1, OriginalPost: &p2}
+		f := FetchPost{Post: p1, OriginalPost: originalPost}
 		posts = append(posts, f)
 	}
 

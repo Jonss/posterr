@@ -24,7 +24,6 @@ func apiResponse(w http.ResponseWriter, statusCode int, responseBody interface{}
 }
 
 type ErrorResponse struct {
-	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 

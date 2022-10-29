@@ -1,7 +1,6 @@
 package httpserver
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -45,7 +44,5 @@ func (h *HttpServer) Start() {
 
 func (h *HttpServer) routes() {
 	api := h.router.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, Posterr!")
-	})
+	api.HandleFunc("/posts", h.FetchPosts()).Methods(http.MethodGet)
 }
