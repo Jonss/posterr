@@ -14,7 +14,11 @@ const (
 	maxPostsDaily = 5
 )
 
-var ErrMaxPostsDailyAchieved = fmt.Errorf("error user is not allowed to post more than %d times within a day", maxPostsDaily)
+var (
+	ErrMaxPostsDailyAchieved = fmt.Errorf("error user is not allowed to post more than %d times within a day", maxPostsDaily)
+	ErrRepost                = errors.New("error user cannot repost an existing repost")
+	ErrQuotePost             = errors.New("error user cannot quote an existing quote-post")
+)
 
 var (
 	today         = time.Now()
@@ -191,9 +195,9 @@ func handleOriginalPost(ctx context.Context, q db.AppQuerier, arg CreatePostPara
 			newPostType := arg.getType()
 			if newPostType == getType(*originalPost) {
 				if newPostType == Reposting {
-					return errors.New("error user cannot repost an existing repost")
+					return ErrRepost
 				}
-				return errors.New("error user cannot quote an existing quote-post")
+				return ErrRepost
 			}
 		}
 	}

@@ -196,6 +196,54 @@ func TestCreatePost(t *testing.T) {
 			wantErrorResponse: NewErrorResponses(
 				NewErrorResponse("error user is not allowed to post more than 5 times within a day")),
 		},
+		{
+			name: "should get an error original post is a reposting",
+			requestBody: `
+			{
+				"user_id": 1,
+				"message": "Ahoy, World!",
+				"originalPostId": 1
+			}`,
+			wantStatusCode: http.StatusUnprocessableEntity,
+			buildStubs: func(service *post_mock.MockService) {
+				service.EXPECT().
+					CountDailyPosts(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil)
+
+				service.EXPECT().
+					CreatePost(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil, post.ErrRepost)
+			},
+			isErrorWant: true,
+			wantErrorResponse: NewErrorResponses(
+				NewErrorResponse("error user is not allowed to post more than 5 times within a day")),
+		},
+		{
+			name: "should get an error original post is a quote-post",
+			requestBody: `
+			{
+				"user_id": 1,
+				"message": "Ahoy, World!",
+				"originalPostId": 1
+			}`,
+			wantStatusCode: http.StatusUnprocessableEntity,
+			buildStubs: func(service *post_mock.MockService) {
+				service.EXPECT().
+					CountDailyPosts(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil)
+
+				service.EXPECT().
+					CreatePost(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil, post.ErrQuotePost)
+			},
+			isErrorWant: true,
+			wantErrorResponse: NewErrorResponses(
+				NewErrorResponse("error user is not allowed to post more than 5 times within a day")),
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -240,7 +288,6 @@ func TestCreatePost(t *testing.T) {
 				if err != nil {
 					t.Fatalf("unexpected error decoding success response. error=(%v)", err)
 				}
-
 			}
 		})
 	}

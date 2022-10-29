@@ -121,8 +121,14 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 			UserID:         int64(req.UserID),
 			OriginalPostID: req.OriginalPostID,
 		})
+
 		if err != nil {
 			// TODO: handle errors when original_post and user does not exists
+			if err == post.ErrQuotePost || err == post.ErrRepost {
+				apiResponse(w, http.StatusUnprocessableEntity, NewErrorResponse(err.Error()))
+				return
+			}
+
 			apiResponse(w, http.StatusInternalServerError, NewErrorResponse(err.Error()))
 			return
 		}
