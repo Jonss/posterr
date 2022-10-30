@@ -85,7 +85,7 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 }
 
 type CreatePostRequest struct {
-	UserID         int64   `json:"user_id" validate:"required"`
+	UserID         int64   `json:"userId" validate:"required"`
 	Message        *string `json:"message"`
 	OriginalPostID *int64  `json:"originalPostId"`
 }
