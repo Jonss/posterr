@@ -12,8 +12,8 @@ var (
 )
 
 type FetchUser struct {
-	UserID int64
-	Username string
+	UserID    int64
+	Username  string
 	CreatedAt time.Time
 }
 
@@ -26,8 +26,8 @@ func (s *service) FetchUser(ctx context.Context, username string) (*FetchUser, e
 		return nil, err
 	}
 	return &FetchUser{
-		UserID: user.ID,
-		Username: user.Username,
+		UserID:    user.ID,
+		Username:  user.Username,
 		CreatedAt: user.CreatedAt,
 	}, nil
 }

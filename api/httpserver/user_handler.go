@@ -11,15 +11,16 @@ import (
 // TODO:
 // test
 type FetchUserResponse struct {
-	Username string `json:"username"`
+	Username   string `json:"username"`
 	DateJoined string `json:"dateJoined"`
-	PostsCount int64 `json:"postsCount"`
+	PostsCount int64  `json:"postsCount"`
 }
+
 func (s *HttpServer) FetchUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		username := mux.Vars(r)["username"]
-		
+
 		fetchUser, err := s.services.UserService.FetchUser(ctx, username)
 		if err != nil {
 			if err == user.ErrUserNotFound {
@@ -37,7 +38,7 @@ func (s *HttpServer) FetchUser() http.HandlerFunc {
 		}
 
 		response := FetchUserResponse{
-			Username: fetchUser.Username,
+			Username:   fetchUser.Username,
 			DateJoined: utils.ResponseFormatDate(fetchUser.CreatedAt),
 			PostsCount: postsCount,
 		}
