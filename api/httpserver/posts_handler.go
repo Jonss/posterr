@@ -3,6 +3,7 @@ package httpserver
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -16,7 +17,9 @@ var (
 )
 
 var (
-	defaultPageSize = 5
+	defaultPageSize           = 5
+	messageMaxLength          = 777
+	messageLengthErrorMessage = fmt.Sprintf("message must be at maximum %d characters in length", messageMaxLength)
 )
 
 type Post struct {
@@ -84,7 +87,7 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 
 type CreatePostRequest struct {
 	UserID         int64   `json:"user_id" validate:"required"`
-	Message        *string `json:"message" validate:"required,lte=777"`
+	Message        *string `json:"message"`
 	OriginalPostID *int64  `json:"originalPostId"`
 }
 
@@ -109,6 +112,11 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 			validateRequestBody(err, w, s.restValidator.Translator)
 			return
 		}
+		if req.Message != nil && len(*req.Message) > messageMaxLength {
+			apiResponse(w, http.StatusBadRequest, NewErrorResponses(NewErrorResponse(messageLengthErrorMessage)))
+			return
+		}
+
 		// checks if user can post in the day
 		err = s.services.PostService.CountDailyPosts(ctx, req.UserID)
 		if err != nil {
