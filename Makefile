@@ -5,7 +5,7 @@ env-up:
 	docker-compose up --build -d db
 
 run-docker:
-	docker-compose up --build -d app
+	docker-compose up --build app
 
 run: env-up run-docker
 

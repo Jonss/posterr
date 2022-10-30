@@ -9,7 +9,6 @@ COPY .env /app/.env
 COPY go.mod /app/go.mod
 COPY go.sum /app/go.sum
 RUN CGO_ENABLED=0 GOOS=linux go build -o bin main.go
-CMD ls
 
 FROM alpine:3.15.1 as posterr-app
 COPY --from=gobuilder /app/bin bin
