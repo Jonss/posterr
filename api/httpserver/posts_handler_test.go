@@ -176,7 +176,6 @@ func TestCreatePost(t *testing.T) {
 				NewErrorResponse("message must be at maximum 777 characters in length"),
 			),
 		},
-
 		{
 			name: "should get an error when user already created 5 posts within a day",
 			requestBody: `
@@ -218,7 +217,7 @@ func TestCreatePost(t *testing.T) {
 			},
 			isErrorWant: true,
 			wantErrorResponse: NewErrorResponses(
-				NewErrorResponse("error user is not allowed to post more than 5 times within a day")),
+				NewErrorResponse("error user cannot repost an existing repost")),
 		},
 		{
 			name: "should get an error original post is a quote-post",
@@ -242,7 +241,7 @@ func TestCreatePost(t *testing.T) {
 			},
 			isErrorWant: true,
 			wantErrorResponse: NewErrorResponses(
-				NewErrorResponse("error user is not allowed to post more than 5 times within a day")),
+				NewErrorResponse("error user cannot quote an existing quote-post")),
 		},
 	}
 	for _, tc := range testCases {
@@ -278,6 +277,7 @@ func TestCreatePost(t *testing.T) {
 				}
 
 				for i, errResp := range response.Errors {
+					fmt.Println(errResp.Message)
 					if tc.wantErrorResponse.Errors[i].Message != errResp.Message {
 						t.Errorf("POST /api/posts. want error message %s, got %s", tc.wantErrorResponse.Errors[i].Message, errResp.Message)
 					}

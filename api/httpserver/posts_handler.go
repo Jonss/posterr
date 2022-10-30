@@ -125,11 +125,11 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 		if err != nil {
 			// TODO: handle errors when original_post and user does not exists
 			if err == post.ErrQuotePost || err == post.ErrRepost {
-				apiResponse(w, http.StatusUnprocessableEntity, NewErrorResponse(err.Error()))
+				apiResponse(w, http.StatusUnprocessableEntity, NewErrorResponses(NewErrorResponse(err.Error())))
 				return
 			}
 
-			apiResponse(w, http.StatusInternalServerError, NewErrorResponse(err.Error()))
+			apiResponse(w, http.StatusInternalServerError, NewErrorResponses(NewErrorResponse(err.Error())))
 			return
 		}
 
