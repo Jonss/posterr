@@ -15,3 +15,10 @@ func NullInt64ToInt64Ptr(n sql.NullInt64) *int64 {
 	}
 	return &n.Int64
 }
+
+func Int64ToPtrNullInt64(n int64) sql.NullInt64 {
+	return Int64PtrToNullInt64(&n)
+}
+func Int64ToPtr(n int64) *int64 {
+	return &n
+}

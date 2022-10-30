@@ -1,8 +1,13 @@
-run:
+run-local:
 	go run cmd/posterr/main.go
 
 env-up:
 	docker-compose up --build -d db
+
+run-docker:
+	docker-compose up --build -d app
+
+run: env-up run-docker
 
 env-down:
 	docker-compose down --remove-orphans
@@ -15,14 +20,15 @@ cover:
 	go tool cover -html coverage.out -o coverage.html
 	open coverage.html
 
-generate-query:
+gen-query:
 	sqlc generate
-
-run-docker:
-	docker-compose up --build -d app
 
 seed:
 	go run cmd/seed/main.go
 
 fmt:
 	gofmt -s -w .
+
+gen-mock:
+	mockgen -destination db/mock/db.go github.com/Jonss/posterr/db AppQuerier
+	mockgen -destination pkg/post/mock/service.go github.com/Jonss/posterr/pkg/post Service

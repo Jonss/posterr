@@ -101,6 +101,129 @@ func TestFetchPosts(t *testing.T) {
 	}
 }
 
+func TestCreatePosts(t *testing.T) {
+	testCases := []struct {
+		name        string
+		buildStubs  func(querier *mock_db.MockAppQuerier)
+		arg         post.CreatePostParams
+		isErrorWant bool
+		wantErr     error
+	}{
+		{
+			name: "should create a post",
+			buildStubs: func(querier *mock_db.MockAppQuerier) {
+				querier.EXPECT().
+					CreatePost(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.Post{
+						ID:        1,
+						Content:   utils.StrToNullStr("a post"),
+						CreatedAt: time.Now(),
+					}, nil)
+			},
+			arg: post.CreatePostParams{
+				UserID:  1,
+				Message: utils.StrToPointer("a post"),
+			},
+		},
+		{
+			name: "should return an error when original post is a repost",
+			buildStubs: func(querier *mock_db.MockAppQuerier) {
+				originalPost := &db.DetailedPost{
+					Post: db.Post{
+						ID:      1,
+						Content: utils.StrToNullStr("this is an original post"),
+					},
+				}
+
+				querier.EXPECT().
+					FetchPost(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&db.FetchPost{
+						Post: db.DetailedPost{
+							Post: db.Post{
+								UserID:         1,
+								ID:             2,
+								OriginalPostID: utils.Int64ToPtrNullInt64(originalPost.ID),
+							},
+						},
+						OriginalPost: originalPost,
+					}, nil)
+			},
+			arg: post.CreatePostParams{
+				UserID:         1,
+				OriginalPostID: utils.Int64ToPtr(2),
+			},
+			isErrorWant: true,
+			wantErr:     post.ErrRepost,
+		},
+		{
+			name: "should return an error when original post is a quote-post",
+			buildStubs: func(querier *mock_db.MockAppQuerier) {
+				originalPost := &db.DetailedPost{
+					Post: db.Post{
+						ID:      1,
+						Content: utils.StrToNullStr("this is an original post"),
+					},
+				}
+
+				querier.EXPECT().
+					FetchPost(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&db.FetchPost{
+						Post: db.DetailedPost{
+							Post: db.Post{
+								UserID:         1,
+								ID:             2,
+								OriginalPostID: utils.Int64ToPtrNullInt64(1),
+								Content:        utils.StrToNullStr("this is a quote post"),
+							},
+						},
+						OriginalPost: originalPost,
+					}, nil)
+			},
+			arg: post.CreatePostParams{
+				UserID:         1,
+				OriginalPostID: utils.Int64ToPtr(2),
+				Message:        utils.StrToPointer("this is sparta!"),
+			},
+			isErrorWant: true,
+			wantErr:     post.ErrQuotePost,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			querier := mock_db.NewMockAppQuerier(ctrl)
+			tc.buildStubs(querier)
+
+			service := post.NewPostService(querier)
+			got, err := service.CreatePost(context.Background(), tc.arg)
+			if err != nil && !tc.isErrorWant {
+				t.Fatalf("unexpected error creating post. error=(%v)", err)
+			}
+
+			if tc.isErrorWant {
+				if err != tc.wantErr {
+					t.Errorf("Err got %v want %v", err, tc.wantErr)
+				}
+			} else {
+				now := time.Now()
+				if got.CreatedAt.After(now) {
+					t.Errorf("Post.CreatedAt got %v want %v", got.CreatedAt, now)
+				}
+
+				if got.Content != nil && tc.arg.Message != nil && *got.Content != *tc.arg.Message {
+					t.Errorf("Post.Content got %v want %v", *got.Content, *tc.arg.Message)
+				}
+			}
+		})
+	}
+}
+
 func buildPost(
 	username string,
 	content sql.NullString,

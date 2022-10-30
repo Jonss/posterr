@@ -141,6 +141,7 @@ type CreatePostResponse struct {
 func (arg CreatePostParams) getType() PostType {
 	hasMessage := arg.Message != nil
 	hasOriginalPost := arg.OriginalPostID != nil
+	fmt.Println(arg.Message, "a", hasMessage, "hasOp", hasOriginalPost)
 	if hasOriginalPost && !hasMessage {
 		return Reposting
 	}
@@ -197,7 +198,7 @@ func handleOriginalPost(ctx context.Context, q db.AppQuerier, arg CreatePostPara
 				if newPostType == Reposting {
 					return ErrRepost
 				}
-				return ErrRepost
+				return ErrQuotePost
 			}
 		}
 	}
