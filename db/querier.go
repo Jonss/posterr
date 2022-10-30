@@ -7,8 +7,10 @@ import (
 )
 
 type Querier interface {
-	CountPosts(ctx context.Context, arg CountPostsParams) (int64, error)
+	CountPosts(ctx context.Context, userID int64) (int64, error)
+	CountPostsInRange(ctx context.Context, arg CountPostsInRangeParams) (int64, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
+	FindUserByUsername(ctx context.Context, username string) (User, error)
 	SeedPost(ctx context.Context, arg SeedPostParams) (Post, error)
 	SeedUser(ctx context.Context, username string) (int64, error)
 }

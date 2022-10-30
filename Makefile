@@ -32,3 +32,4 @@ fmt:
 gen-mock:
 	mockgen -destination db/mock/db.go github.com/Jonss/posterr/db AppQuerier
 	mockgen -destination pkg/post/mock/service.go github.com/Jonss/posterr/pkg/post Service
+	mockgen -destination pkg/user/mock/service.go github.com/Jonss/posterr/pkg/user Service

@@ -109,7 +109,7 @@ func TestCountPosts(t *testing.T) {
 			start := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, time.UTC)
 			end := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 59, time.UTC)
 
-			got, err := querier.CountPosts(ctx, CountPostsParams{
+			got, err := querier.CountPostsInRange(ctx, CountPostsInRangeParams{
 				UserID:      userID,
 				CreatedAt:   start,
 				CreatedAt_2: end,

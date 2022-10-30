@@ -6,11 +6,13 @@ import (
 
 	"github.com/Jonss/posterr/config"
 	"github.com/Jonss/posterr/pkg/post"
+	"github.com/Jonss/posterr/pkg/user"
 	"github.com/gorilla/mux"
 )
 
 type Services struct {
 	PostService post.Service
+	UserService user.Service
 }
 
 type HttpServer struct {
@@ -46,4 +48,6 @@ func (h *HttpServer) routes() {
 	api := h.router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/posts", h.FetchPosts()).Methods(http.MethodGet)
 	api.HandleFunc("/posts", h.CreatePost()).Methods(http.MethodPost)
+
+	api.HandleFunc("/users/{username}", h.FetchUser()).Methods(http.MethodGet)
 }

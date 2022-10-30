@@ -9,6 +9,7 @@ import (
 	"github.com/Jonss/posterr/config"
 	"github.com/Jonss/posterr/db"
 	"github.com/Jonss/posterr/pkg/post"
+	"github.com/Jonss/posterr/pkg/user"
 	"github.com/gorilla/mux"
 )
 
@@ -38,6 +39,7 @@ func main() {
 	// creates services
 	services := httpserver.Services{
 		PostService: post.NewPostService(q),
+		UserService: user.NewUservice(q),
 	}
 
 	// creates httpServer

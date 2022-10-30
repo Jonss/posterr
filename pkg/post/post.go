@@ -110,7 +110,7 @@ func (s *service) FetchPosts(ctx context.Context, arg FetchPostParams) (FetchPos
 }
 
 func (s *service) CountDailyPosts(ctx context.Context, userId int64) error {
-	count, err := s.queries.CountPosts(ctx, db.CountPostsParams{
+	count, err := s.queries.CountPostsInRange(ctx, db.CountPostsInRangeParams{
 		UserID:      userId,
 		CreatedAt:   startOfTheDay,
 		CreatedAt_2: endOfTheDay,
@@ -203,4 +203,12 @@ func handleOriginalPost(ctx context.Context, q db.AppQuerier, arg CreatePostPara
 		}
 	}
 	return nil
+}
+
+func (s *service) CountPosts(ctx context.Context, userID int64) (int64, error) {
+	postsCount, err := s.queries.CountPosts(ctx, userID)
+	if err != nil {
+		return 0, err
+	}
+	return postsCount, nil
 }

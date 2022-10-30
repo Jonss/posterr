@@ -7,6 +7,17 @@ import (
 	"context"
 )
 
+const findUserByUsername = `-- name: FindUserByUsername :one
+SELECT id, username, created_at FROM users WHERE username = $1
+`
+
+func (q *Queries) FindUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, findUserByUsername, username)
+	var i User
+	err := row.Scan(&i.ID, &i.Username, &i.CreatedAt)
+	return i, err
+}
+
 const seedUser = `-- name: SeedUser :one
 INSERT INTO users(username) VALUES ($1) returning id
 `

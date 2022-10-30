@@ -36,7 +36,7 @@ func (m *MockAppQuerier) EXPECT() *MockAppQuerierMockRecorder {
 }
 
 // CountPosts mocks base method.
-func (m *MockAppQuerier) CountPosts(arg0 context.Context, arg1 db.CountPostsParams) (int64, error) {
+func (m *MockAppQuerier) CountPosts(arg0 context.Context, arg1 int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CountPosts", arg0, arg1)
 	ret0, _ := ret[0].(int64)
@@ -48,6 +48,21 @@ func (m *MockAppQuerier) CountPosts(arg0 context.Context, arg1 db.CountPostsPara
 func (mr *MockAppQuerierMockRecorder) CountPosts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountPosts", reflect.TypeOf((*MockAppQuerier)(nil).CountPosts), arg0, arg1)
+}
+
+// CountPostsInRange mocks base method.
+func (m *MockAppQuerier) CountPostsInRange(arg0 context.Context, arg1 db.CountPostsInRangeParams) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountPostsInRange", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountPostsInRange indicates an expected call of CountPostsInRange.
+func (mr *MockAppQuerierMockRecorder) CountPostsInRange(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountPostsInRange", reflect.TypeOf((*MockAppQuerier)(nil).CountPostsInRange), arg0, arg1)
 }
 
 // CreatePost mocks base method.
@@ -93,6 +108,21 @@ func (m *MockAppQuerier) FetchPosts(arg0 context.Context, arg1 db.FetchPostsPara
 func (mr *MockAppQuerierMockRecorder) FetchPosts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchPosts", reflect.TypeOf((*MockAppQuerier)(nil).FetchPosts), arg0, arg1)
+}
+
+// FindUserByUsername mocks base method.
+func (m *MockAppQuerier) FindUserByUsername(arg0 context.Context, arg1 string) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindUserByUsername", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindUserByUsername indicates an expected call of FindUserByUsername.
+func (mr *MockAppQuerierMockRecorder) FindUserByUsername(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserByUsername", reflect.TypeOf((*MockAppQuerier)(nil).FindUserByUsername), arg0, arg1)
 }
 
 // SeedPost mocks base method.

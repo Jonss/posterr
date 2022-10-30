@@ -10,6 +10,7 @@ import (
 
 	"github.com/Jonss/posterr/pkg/post"
 	post_mock "github.com/Jonss/posterr/pkg/post/mock"
+	user_mock "github.com/Jonss/posterr/pkg/user/mock"
 	"github.com/Jonss/posterr/pkg/utils"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -68,8 +69,10 @@ func TestFetchPosts(t *testing.T) {
 			postServiceMock := post_mock.NewMockService(ctrl)
 			tc.buildStubs(postServiceMock)
 
+			userServiceMock := user_mock.NewMockService(ctrl)
+
 			srv := NewHttpServer(
-				mux.NewRouter(), fakeConfig, Services{postServiceMock})
+				mux.NewRouter(), fakeConfig, Services{postServiceMock, userServiceMock})
 			srv.Start()
 			// end setup
 
@@ -253,8 +256,10 @@ func TestCreatePost(t *testing.T) {
 			postServiceMock := post_mock.NewMockService(ctrl)
 			tc.buildStubs(postServiceMock)
 
+			userServiceMock := user_mock.NewMockService(ctrl)
+
 			srv := NewHttpServer(
-				mux.NewRouter(), fakeConfig, Services{postServiceMock})
+				mux.NewRouter(), fakeConfig, Services{postServiceMock, userServiceMock})
 			srv.Start()
 			// end setup
 

@@ -18,6 +18,7 @@ type Service interface {
 	FetchPosts(ctx context.Context, arg FetchPostParams) (FetchPostResponse, error)
 	CountDailyPosts(ctx context.Context, userID int64) error
 	CreatePost(ctx context.Context, arg CreatePostParams) (*CreatePostResponse, error)
+	CountPosts(ctx context.Context, userID int64) (int64, error)
 }
 
 var _ Service = (*service)(nil)

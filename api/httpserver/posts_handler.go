@@ -56,7 +56,7 @@ func (s *HttpServer) FetchPosts() http.HandlerFunc {
 		}
 		fetchPostsResponse, err := s.services.PostService.FetchPosts(ctx, params)
 		if err != nil {
-			apiResponse(w, http.StatusInternalServerError, err)
+			apiResponse(w, http.StatusInternalServerError, NewErrorResponses(ErrorResponse{Message: "unexpected error"}))
 			return
 		}
 
