@@ -45,7 +45,6 @@ type FetchPostsResponse struct {
 	HasPrev            bool                `json:"hasPrev"`
 }
 
-// start_date=2022-05-02&end_date=2022-05-20&page=0&size=10&only_mine=true
 func (s *HttpServer) FetchPosts() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
