@@ -132,7 +132,7 @@ func TestCreatePost(t *testing.T) {
 			name: "should create a post",
 			requestBody: `
 			{
-				"user_id": 1,
+				"userId": 1,
 				"message": "Ahoy, World!",
 				"originalPostId": null
 			}`,
@@ -168,7 +168,7 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "should get errors when originalPostId length is above 777 characters",
 			requestBody: `{
-				"user_id": 1,
+				"userId": 1,
 				"message": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imp8",
 				"originalPostId": null
 			}`,
@@ -183,7 +183,7 @@ func TestCreatePost(t *testing.T) {
 			name: "should get an error when user already created 5 posts within a day",
 			requestBody: `
 			{
-				"user_id": 1,
+				"userId": 1,
 				"message": "Ahoy, World!",
 				"originalPostId": null
 			}`,
@@ -202,7 +202,7 @@ func TestCreatePost(t *testing.T) {
 			name: "should get an error original post is a reposting",
 			requestBody: `
 			{
-				"user_id": 1,
+				"userId": 1,
 				"message": "Ahoy, World!",
 				"originalPostId": 1
 			}`,
@@ -226,7 +226,7 @@ func TestCreatePost(t *testing.T) {
 			name: "should get an error original post is a quote-post",
 			requestBody: `
 			{
-				"user_id": 1,
+				"userId": 1,
 				"message": "Ahoy, World!",
 				"originalPostId": 1
 			}`,
@@ -245,6 +245,21 @@ func TestCreatePost(t *testing.T) {
 			isErrorWant: true,
 			wantErrorResponse: NewErrorResponses(
 				NewErrorResponse("error user cannot quote an existing quote-post")),
+		},
+		{
+			name: "should get an error when message and originalPostId is null",
+			requestBody: `
+			{
+				"userId": 1,
+				"message": null,
+				"originalPostId": null
+			}`,
+			wantStatusCode: http.StatusBadRequest,
+			buildStubs: func(service *post_mock.MockService) {
+			},
+			isErrorWant: true,
+			wantErrorResponse: NewErrorResponses(
+				NewErrorResponse("error message or originalpostid is required")),
 		},
 	}
 	for _, tc := range testCases {
@@ -271,7 +286,7 @@ func TestCreatePost(t *testing.T) {
 			got := w.Result()
 
 			if tc.wantStatusCode != got.StatusCode {
-				t.Fatalf("POST /api/posts . status code. want %d, got %d", tc.wantStatusCode, got.StatusCode)
+				t.Errorf("POST /api/posts . status code. want %d, got %d", tc.wantStatusCode, got.StatusCode)
 			}
 
 			if tc.isErrorWant {
@@ -282,7 +297,6 @@ func TestCreatePost(t *testing.T) {
 				}
 
 				for i, errResp := range response.Errors {
-					fmt.Println(errResp.Message)
 					if tc.wantErrorResponse.Errors[i].Message != errResp.Message {
 						t.Errorf("POST /api/posts. want error message %s, got %s", tc.wantErrorResponse.Errors[i].Message, errResp.Message)
 					}

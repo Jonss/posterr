@@ -241,32 +241,27 @@ func fetchPosts() []db.FetchPost {
 	secondPost := buildPost("drogon", sql.NullString{}, 2, 2)
 	thirdPost := buildPost("vyserion", utils.StrToNullStr("that's a good question"), 3, 3)
 
+	originalPost := &db.OriginalPost{
+		ID:             utils.Int64ToNullInt64(firstPost.Post.ID),
+		Content:        firstPost.Post.Content,
+		UserID:         utils.Int64ToNullInt64(firstPost.Post.UserID),
+		OriginalPostID: utils.Int64ToNullInt64(firstPost.Post.ID),
+		CreatedAt:      utils.TimeToNullTime(firstPost.Post.CreatedAt),
+		Username:       utils.StrToNullStr(firstPost.Post.Username),
+	}
+
 	return []db.FetchPost{
 		{
 			Post:         firstPost.Post,
 			OriginalPost: nil,
 		},
 		{
-			Post: secondPost.Post,
-			OriginalPost: &db.OriginalPost{
-				ID:             utils.Int64ToNullInt64(firstPost.Post.ID),
-				Content:        firstPost.OriginalPost.Content,
-				UserID:         utils.Int64ToNullInt64(firstPost.Post.UserID),
-				OriginalPostID: firstPost.OriginalPost.ID,
-				CreatedAt:      firstPost.OriginalPost.CreatedAt,
-				Username:       utils.StrToNullStr(firstPost.Post.Username),
-			},
+			Post:         secondPost.Post,
+			OriginalPost: originalPost,
 		},
 		{
-			Post: thirdPost.Post,
-			OriginalPost: &db.OriginalPost{
-				ID:             utils.Int64ToNullInt64(firstPost.Post.ID),
-				Content:        firstPost.OriginalPost.Content,
-				UserID:         utils.Int64ToNullInt64(firstPost.Post.UserID),
-				OriginalPostID: firstPost.OriginalPost.ID,
-				CreatedAt:      firstPost.OriginalPost.CreatedAt,
-				Username:       utils.StrToNullStr(firstPost.Post.Username),
-			},
+			Post:         thirdPost.Post,
+			OriginalPost: originalPost,
 		},
 	}
 }

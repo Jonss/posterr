@@ -17,9 +17,10 @@ var (
 )
 
 var (
-	defaultPageSize           = 5
-	messageMaxLength          = 777
-	messageLengthErrorMessage = fmt.Sprintf("message must be at maximum %d characters in length", messageMaxLength)
+	defaultPageSize                   = 5
+	messageMaxLength                  = 777
+	messageLengthErrorMessage         = fmt.Sprintf("message must be at maximum %d characters in length", messageMaxLength)
+	messageOrOriginalPostIdIsRequired = "error message or originalPostId is required"
 )
 
 type Post struct {
@@ -111,6 +112,12 @@ func (s *HttpServer) CreatePost() http.HandlerFunc {
 			validateRequestBody(err, w, s.restValidator.Translator)
 			return
 		}
+
+		if req.Message == nil && req.OriginalPostID == nil {
+			apiResponse(w, http.StatusBadRequest, NewErrorResponses(NewErrorResponse(messageOrOriginalPostIdIsRequired)))
+			return
+		}
+
 		if req.Message != nil && len(*req.Message) > messageMaxLength {
 			apiResponse(w, http.StatusBadRequest, NewErrorResponses(NewErrorResponse(messageLengthErrorMessage)))
 			return

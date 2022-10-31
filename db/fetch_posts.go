@@ -93,9 +93,9 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 	posts := make([]FetchPost, 0)
 	for rows.Next() {
 		var p1 DetailedPost
-		var p2 *OriginalPost
+		var p2 OriginalPost
 
-		rows.Scan(
+		err = rows.Scan(
 			&p1.ID,
 			&p1.Content,
 			&p1.UserID,
@@ -109,11 +109,15 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 			&p2.CreatedAt,
 			&p2.Username,
 		)
+		if err != nil {
+			return FetchPosts{}, nil
+		}
+
 		var originalPost *OriginalPost
 		if !p2.ID.Valid {
 			originalPost = nil
 		} else {
-			originalPost = p2
+			originalPost = &p2
 		}
 
 		f := FetchPost{Post: p1, OriginalPost: originalPost}
@@ -157,14 +161,15 @@ func (q *Queries) FetchPost(ctx context.Context, ID int64) (*FetchPost, error) {
 		&p2.CreatedAt,
 		&p2.Username,
 	)
+	if err != nil {
+		return nil, err
+	}
+
 	var originalPost *OriginalPost
 	if !p2.ID.Valid {
 		originalPost = nil
 	} else {
 		originalPost = &p2
-	}
-	if err != nil {
-		return nil, err
 	}
 
 	return &FetchPost{Post: p1, OriginalPost: originalPost}, nil
