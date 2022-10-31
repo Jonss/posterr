@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "2724a764-b35b-4402-be6b-dd4c23160be0",
+		"name": "posterr",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16717065"
+	},
+	"item": [
+		{
+			"name": "Fetch posts with params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9000/api/posts?start_date=2022-10-29&end_date=2022-10-30&page=0&size=10&only_mine=true&user_id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"posts"
+					],
+					"query": [
+						{
+							"key": "start_date",
+							"value": "2022-10-29"
+						},
+						{
+							"key": "end_date",
+							"value": "2022-10-30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "only_mine",
+							"value": "true"
+						},
+						{
+							"key": "user_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9000/api/posts?start_date=2022-10-29&end_date=2022-10-30&page=0&size=10&only_mine=true&user_id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"posts"
+					],
+					"query": [
+						{
+							"key": "start_date",
+							"value": "2022-10-29"
+						},
+						{
+							"key": "end_date",
+							"value": "2022-10-30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "only_mine",
+							"value": "true"
+						},
+						{
+							"key": "user_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": 1,\n    \"message\": \"a message\",\n    \"originalPostId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/api/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

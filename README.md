@@ -39,6 +39,8 @@ The key `SHOULD_MIGRATE` is set to `true` to run on application startup. I decid
 
 ### How to use the REST API?
 
+You can use the postman collection from `docs/` dir.
+
 Fetch posts: `GET /api/posts?start_date=2022-05-02&end_date=2022-05-20&page=0&size=10&only_mine=true`
 Response:
 
@@ -107,15 +109,14 @@ User profile can use the fetch user info endpoint and fetch posts endpoint. I cr
 
 I should have used some library to help me on assertion, such as testify or is. Unfortunately, doing the assertions using `if` took more time than expected, and the code is not so clean.
 
-I created a simple database with only posts and user tables.
-The posts table contains the post itself and a reference for another post, which is used to check if the post is original, repost, and quote-post.
+- If this project were to grow and have many users and posts, which parts do you think would fail first?
+  I created a simple database with only posts and user tables.
+  The posts table contains the post itself and a reference for another post, which is used to check if the post is original, repost, and quote-post.
 
 - A original post has a null original_post_id.
 - A repost post has an `original_post_id` and a null message.
 - A quote-post has an original_post_id and a message.
-  I should have created an enum and saved it in the database to make it more straightforward. Instead, I handled every type in the service layer. Thinking about this part, in an eventual refactoring, this part might be confusing , so I'd improve it before.
-
-- If this project were to grow and have many users and posts, which parts do you think would fail first?
+  I should have created an enum and saved it in the database to make it more straightforward. Instead, I handled every type in the service layer. Thinking about this part, in an eventual refactoring, this part might be confusing, so I'd improve this part.
 
 - In a real-life situation, what steps would you take to scale this product? What other types of technology and infrastructure might you need to use?
   I'd create a spike to apply cache the posts and users.
