@@ -129,11 +129,9 @@ func TestCreatePosts(t *testing.T) {
 		{
 			name: "should return an error when original post is a repost",
 			buildStubs: func(querier *mock_db.MockAppQuerier) {
-				originalPost := &db.DetailedPost{
-					Post: db.Post{
-						ID:      1,
-						Content: utils.StrToNullStr("this is an original post"),
-					},
+				originalPost := &db.OriginalPost{
+					ID:      utils.Int64ToNullInt64(1),
+					Content: utils.StrToNullStr("this is an original post"),
 				}
 
 				querier.EXPECT().
@@ -144,7 +142,7 @@ func TestCreatePosts(t *testing.T) {
 							Post: db.Post{
 								UserID:         1,
 								ID:             2,
-								OriginalPostID: utils.Int64ToPtrNullInt64(originalPost.ID),
+								OriginalPostID: originalPost.ID,
 							},
 						},
 						OriginalPost: originalPost,
@@ -160,11 +158,9 @@ func TestCreatePosts(t *testing.T) {
 		{
 			name: "should return an error when original post is a quote-post",
 			buildStubs: func(querier *mock_db.MockAppQuerier) {
-				originalPost := &db.DetailedPost{
-					Post: db.Post{
-						ID:      1,
-						Content: utils.StrToNullStr("this is an original post"),
-					},
+				originalPost := &db.OriginalPost{
+					ID:      utils.Int64ToNullInt64(1),
+					Content: utils.StrToNullStr("this is an original post"),
 				}
 
 				querier.EXPECT().
@@ -175,7 +171,7 @@ func TestCreatePosts(t *testing.T) {
 							Post: db.Post{
 								UserID:         1,
 								ID:             2,
-								OriginalPostID: utils.Int64ToPtrNullInt64(1),
+								OriginalPostID: utils.Int64ToNullInt64(1),
 								Content:        utils.StrToNullStr("this is a quote post"),
 							},
 						},
@@ -252,16 +248,24 @@ func fetchPosts() []db.FetchPost {
 		},
 		{
 			Post: secondPost.Post,
-			OriginalPost: &db.DetailedPost{
-				Post:     firstPost.Post.Post,
-				Username: firstPost.Post.Username,
+			OriginalPost: &db.OriginalPost{
+				ID:             utils.Int64ToNullInt64(firstPost.Post.ID),
+				Content:        firstPost.OriginalPost.Content,
+				UserID:         utils.Int64ToNullInt64(firstPost.Post.UserID),
+				OriginalPostID: firstPost.OriginalPost.ID,
+				CreatedAt:      firstPost.OriginalPost.CreatedAt,
+				Username:       utils.StrToNullStr(firstPost.Post.Username),
 			},
 		},
 		{
 			Post: thirdPost.Post,
-			OriginalPost: &db.DetailedPost{
-				Post:     firstPost.Post.Post,
-				Username: firstPost.Post.Username,
+			OriginalPost: &db.OriginalPost{
+				ID:             utils.Int64ToNullInt64(firstPost.Post.ID),
+				Content:        firstPost.OriginalPost.Content,
+				UserID:         utils.Int64ToNullInt64(firstPost.Post.UserID),
+				OriginalPostID: firstPost.OriginalPost.ID,
+				CreatedAt:      firstPost.OriginalPost.CreatedAt,
+				Username:       utils.StrToNullStr(firstPost.Post.Username),
 			},
 		},
 	}

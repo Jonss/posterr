@@ -22,6 +22,13 @@ func StrToPointer(str string) *string {
 	return &str
 }
 
+func NullStrToStr(str sql.NullString) string {
+	if !str.Valid {
+		return ""
+	}
+	return str.String
+}
+
 func StrToNullStr(str string) sql.NullString {
 	return sql.NullString{String: str, Valid: true}
 }

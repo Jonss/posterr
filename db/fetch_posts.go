@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 )
@@ -39,9 +40,18 @@ type DetailedPost struct {
 	Username string
 }
 
+type OriginalPost struct {
+	ID             sql.NullInt64
+	Content        sql.NullString
+	UserID         sql.NullInt64
+	OriginalPostID sql.NullInt64
+	CreatedAt      sql.NullTime
+	Username       sql.NullString
+}
+
 type FetchPost struct {
 	Post         DetailedPost
-	OriginalPost *DetailedPost
+	OriginalPost *OriginalPost
 }
 
 type FetchPosts struct {
@@ -83,7 +93,7 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 	posts := make([]FetchPost, 0)
 	for rows.Next() {
 		var p1 DetailedPost
-		var p2 DetailedPost
+		var p2 *OriginalPost
 
 		rows.Scan(
 			&p1.ID,
@@ -99,11 +109,11 @@ func (q *Queries) FetchPosts(ctx context.Context, arg FetchPostsParams) (FetchPo
 			&p2.CreatedAt,
 			&p2.Username,
 		)
-		var originalPost *DetailedPost
-		if p2.ID == 0 {
+		var originalPost *OriginalPost
+		if !p2.ID.Valid {
 			originalPost = nil
 		} else {
-			originalPost = &p2
+			originalPost = p2
 		}
 
 		f := FetchPost{Post: p1, OriginalPost: originalPost}
@@ -131,7 +141,7 @@ func (q *Queries) FetchPost(ctx context.Context, ID int64) (*FetchPost, error) {
 	row := q.db.QueryRowContext(ctx, query, ID)
 
 	var p1 DetailedPost
-	var p2 DetailedPost
+	var p2 OriginalPost
 
 	err := row.Scan(
 		&p1.ID,
@@ -147,8 +157,8 @@ func (q *Queries) FetchPost(ctx context.Context, ID int64) (*FetchPost, error) {
 		&p2.CreatedAt,
 		&p2.Username,
 	)
-	var originalPost *DetailedPost
-	if p2.ID == 0 {
+	var originalPost *OriginalPost
+	if !p2.ID.Valid {
 		originalPost = nil
 	} else {
 		originalPost = &p2

@@ -174,15 +174,15 @@ func (s *service) CreatePost(ctx context.Context, arg CreatePostParams) (*Create
 	}, nil
 }
 
-func buildOriginalPost(p *db.DetailedPost) *Post {
+func buildOriginalPost(p *db.OriginalPost) *Post {
 	if p == nil {
 		return nil
 	}
 	return &Post{
-		ID:        p.Post.ID,
-		Message:   utils.NullStrToPointer(p.Post.Content),
-		Username:  p.Username,
-		CreatedAt: p.Post.CreatedAt,
+		ID:        utils.NullInt64ToInt64(p.ID),
+		Message:   utils.NullStrToPointer(p.Content),
+		Username:  *utils.NullStrToPointer(p.Username),
+		CreatedAt: p.CreatedAt.Time,
 	}
 }
 
