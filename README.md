@@ -105,6 +105,10 @@ Response
 Homepage: requires 10 itens in the first request. It can be set using the query parameters `page` and `size`. The other parameters can be used when required.
 User profile can use the fetch user info endpoint and fetch posts endpoint. I created the API independent of resources, so `/api/posts` knows post details only and `users/{username}` knows user details only.
 
+### Coverage
+
+You can check the coverage running the command `make cover`.
+
 ## Critique
 
 I should have used some library to help me on assertion, such as testify or is. Unfortunately, doing the assertions using `if` took more time than expected, and the code is not so clean.
@@ -116,7 +120,8 @@ I should have used some library to help me on assertion, such as testify or is. 
 - A original post has a null original_post_id.
 - A repost post has an `original_post_id` and a null message.
 - A quote-post has an original_post_id and a message.
-  I should have created an enum and saved it in the database to make it more straightforward. Instead, I handled every type in the service layer. Thinking about this part, in an eventual refactoring, this part might be confusing, so I'd improve this part.
+
+I should have created an enum and saved it in the database to make it more straightforward. Instead, I handled every type in the service layer. Thinking about this part, in an eventual refactoring, this part might be confusing, so I'd improve this part.
 
 - In a real-life situation, what steps would you take to scale this product? What other types of technology and infrastructure might you need to use?
   I'd create a spike to apply cache the posts and users.
